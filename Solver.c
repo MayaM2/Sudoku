@@ -10,6 +10,17 @@
 #include "Enums.h"
 #include "Structs.h"
 
+// Gurobi variables and declarations :
+#include "gurobi_c.h"
+extern int **board;
+extern int**fixed;
+extern int**solvedBoard;
+extern int blockHeight;
+extern int blockWidth;
+extern int dim;
+extern int gameMode;
+extern int markErrors;
+
 /*
  * "Hidden" func- check neighbors. if only one val is possible, return it, else 0;
  */
@@ -100,40 +111,32 @@ void Autofill(int** board, UndoRedoList *urli, int blockHeight, int blockWidth)
 		urli->curr=urli->tail;
 	}
 }
+
 /*
-
-GUROBI
-#include "gurobi_c.h"
-
-extern int **board;
-extern int**fixed;
-extern int blockHeight;
-extern int blockWidth;
-extern int dim;
-extern int gameMode;
-extern int markErrors;
-
+ * Will use Gurobi Optimizer to try and solve current board, and under the constrains
+ * of the Sudoku game rules and the fixed numbers.
+ * Will return 1 if there is a solution, -1 if there is no solution, or 0 if there was a runtime problem.
+ * Will update extern int** SolvedBoard accordingly.
+ */
 int ILPSolver(void){
-	GRBenv   *env   = NULL;
+	GRBenv *env = NULL;
 	GRBmodel *model = NULL;
 	int error = 0;
-	double sol[3];
-	int ind[3];
-	double val[3];
-	double obj[3];
-	char vtype[3];
+	double sol[dim];
+	int ind[dim*dim];
+	int val[dim*dim];
+	int obj[dim*dim];
+	char vtype[dim*dim];
 	int optimstatus;
 	double objval;
- */
+	int zero=0;
 
 
 
-	  /* Free model and environment
-	  GRBfreemodel(model);
-	  GRBfreeenv(env);
 
-	  return 0;
-
+	GRBfreemodel(model); // free model memory
+	GRBfreeenv(env); // free environment memory
+	return 0;
 }
-*/
+
 
