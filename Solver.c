@@ -197,6 +197,12 @@ int ILPSolver(void){
 		return 0;
 	}
 
+	error = GRBgetdblattarray(model,GRB_DBL_ATTR_X,0,dim*dim*dim,sol);
+	if(error){
+		printf("Error %d : in GRBgetdblattarray: %s\n", error, GRBgeterrormsg(env));
+		return 0;
+	}
+
 
 
 	/*Free model*/
