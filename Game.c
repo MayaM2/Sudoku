@@ -141,6 +141,8 @@ void MainMemoryFreer()
 		free(board);
 	if(fixed!=NULL)
 		free(fixed);
+	if(solvedBoard !=NULL)
+		free(solvedBoard);
 	if(undoRedo!=NULL)
 		undoRedoDestroyer(undoRedo);
 }
