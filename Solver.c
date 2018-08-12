@@ -187,7 +187,24 @@ int ILPSolver(void){
 		return 0;
 	}
 
-	/*Add constrains: there are four kinds: rows, cols, block, fixed*/
+	/*TODO : Add constrains: there are five kinds: cells, rows, cols, block, fixed*/
+	/*Add cell constraints - for each [i,j] cell, only allow to hold one value*/
+	for(i=0;i<dim;i++){
+		for(j=0;j<dim;j++){
+			for(k=0;k<dim;k++){
+				ind[i*dim*dim+j*dim+k]=k;
+				val[k]=1;
+			}
+			error= GRBaddconstr(moedl,dim,ind,val,GRB_EQUAL,1,NULL);
+			if(error){
+				printf("Error %d : in GRBaddconstr: %s\n", error, GRBgeterrormsg(env));
+				GRBfreemodel(model); // free model memory
+				GRBfreeenv(env); // free environment memory
+				return 0;
+			} //end of if error
+		}// end of specific  [i,j] cell
+	}// go through all possible [i,j]
+
 	/*Add row constraints - for each i index*/
 
 
@@ -203,7 +220,7 @@ int ILPSolver(void){
 				ind[i*dim*dim+j*dim+k]=0;
 				val[0]=1; //coeff of constraint is 1
 				error = GRBaddconstr(model,1,ind,val,GRB_EQUAL,1.0,NULL); //add constraint: 1*X=1
-				// for the certain that's in the i*dim*dim+j*dim+k place in variables array.
+				// for the certain X that's in the i*dim*dim+j*dim+k place in variables array.
 				if(error){
 					printf("Error %d : in GRBaddconstr: %s\n", error, GRBgeterrormsg(env));
 					GRBfreemodel(model); // free model memory
