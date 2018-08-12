@@ -497,7 +497,6 @@ switch(inpCommand->commands){
 		else{/* not in edit or solve mode */
 			printf("ERROR: invalid command\n");
 		}
-
 		break;
 
 	case NUMSOLUTIONS_COMMAND:
