@@ -187,11 +187,12 @@ int ILPSolver(void){
 		return 0;
 	}
 
-	/*TODO : Add constrains: there are five kinds: cells, rows, cols, block, fixed*/
+	/*Add constrains: there are five kinds: cells, rows, cols, block, fixed*/
+
 	/*Add cell constraints - for each [i,j] cell, only allow to hold one value*/
 	for(i=0;i<dim;i++){
 		for(j=0;j<dim;j++){
-			for(k=0;k<dim;k++){
+			for(k=0;k<dim;k++){ //sum variable values over all possible k's for specific [i,j]
 				ind[i*dim*dim+j*dim+k]=k;
 				val[k]=1;
 			}
@@ -205,12 +206,45 @@ int ILPSolver(void){
 		}// end of specific  [i,j] cell
 	}// go through all possible [i,j]
 
+
 	/*Add row constraints - for each i index*/
+	for(k=0;k<dim;k++){
+		for(j=0;j<dim;j++){
+			for(i=0;i<dim;i++){ //sum variable values over all the row
+				ind[i*dim*dim+j*dim+k]=i;
+				val[i]=1;
+			}
+			error= GRBaddconstr(moedl,dim,ind,val,GRB_EQUAL,1,NULL);
+			if(error){
+				printf("Error %d : in GRBaddconstr: %s\n", error, GRBgeterrormsg(env));
+				GRBfreemodel(model); // free model memory
+				GRBfreeenv(env); // free environment memory
+				return 0;
+			} //end of if error
+		}// end of specific  [i,j] cell
+	}// go through all possible [i,j]
 
 
 	/*Add col constraints - for each j index*/
+	for(i=0;i<dim;i++){
+		for(k=0;k<dim;k++){
+			for(j=0;j<dim;j++){ //sum variable values over all the col
+				ind[i*dim*dim+j*dim+k]=j;
+				val[j]=1;
+			}
+			error= GRBaddconstr(moedl,dim,ind,val,GRB_EQUAL,1,NULL);
+			if(error){
+				printf("Error %d : in GRBaddconstr: %s\n", error, GRBgeterrormsg(env));
+				GRBfreemodel(model); // free model memory
+				GRBfreeenv(env); // free environment memory
+				return 0;
+			} //end of if error
+		}// end of specific  [i,j] cell
+	}// go through all possible [i,j]
+
 
 	/*Add block constraints*/
+
 
 	/*Add fixed-cell constraints*/
 	for(i=0;i<dim;i++){
