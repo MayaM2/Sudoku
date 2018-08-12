@@ -113,7 +113,31 @@ int numInRange(int num, int lower, int upper){
 /* will print to user only if int printMessages == 1*/
 int validate(int** board,int blockHeight, int blockWidth, int dim, int printMessages)
 {
-	return 0;
+	if(gameMode == SAVE || gemeMode==EDIT){
+		int passed = 0;
+		if(isBoardErroneous()){
+			printf("Error: board contains erroneous values\n");
+			return 0;
+		}
+		passed = ILPSolver();
+		if(passed){
+			if(printMaggages){
+				printf("Validation passed: board is solvable\n");
+			}
+			return 1;
+		}
+		else{
+			if(printMassage){
+				printf("Validation failed: board is not solvable\n");
+			}
+			return 0;
+		}
+
+	}
+	else{
+		printf("ERROR: invalid command\n");
+		return 0;
+	}
 }
 
 /*
@@ -222,22 +246,6 @@ switch(inpCommand->commands){
 		gameMode=EDIT;
 		markErrors=1;
 		OpenFileHelper(inpCommand->fileName);
-
-		/*not needed - openfile deals with null fileName*/
-		/*
-		if(inpCommand->fileName ==NULL){
-			for (int i = 0; i < dim; i++)
-			  for (int j = 0; j < dim; j++){
-				  board[i][j] = 0;
-			  }
-
-			printBoard(board, fixed, gameMode, markErrors, blockHeight, blockWidth, dim);
-			break;
-		}
-		else{
-		}
-		*/
-
 		break;
 
 	case RESET_COMMAND: /*ALMOST DONE*/
@@ -340,10 +348,8 @@ switch(inpCommand->commands){
 		}
 		break;
 
-	case VALIDATE_COMMAND:
-		/*use ILP */
-		validate(board, blockHeight,blockWidth, dim, 1);
-
+	case VALIDATE_COMMAND: /*DONE*/
+		validate(board,blockHeight,blockWidth,dim,1);
 		break;
 	case GENERATE_COMMAND:
 		/*use ILP */
