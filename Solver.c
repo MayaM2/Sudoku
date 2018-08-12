@@ -127,14 +127,14 @@ int ILPSolver(void){
 	int error = 0;
 	double sol[dim*dim*dim];
 	int intSol[dim*dim*dim];
-	int ind[dim*dim*dim];
-	int val[dim*dim*dim];
+	int ind[dim];
+	int val[dim];
 	int obj[dim*dim*dim]; //coeffs of obj. function
 	char vtype[dim*dim*dim];
 	int optimstatus;
 	double objval;
 	int zero=0;
-	int i=0, j=0, k=0;
+	int i=0, j=0, k=0, ii=0,jj=0,count=0;
 
 	/*Create environment*/
 	error = GRBloadenv(&env,""); //TODO - find out about logfiles in gurobi.
@@ -193,10 +193,10 @@ int ILPSolver(void){
 	for(i=0;i<dim;i++){
 		for(j=0;j<dim;j++){
 			for(k=0;k<dim;k++){ //sum variable values over all possible k's for specific [i,j]
-				ind[i*dim*dim+j*dim+k]=k;
-				val[k]=1;
+				ind[k]=i*dim*dim+j*dim+k;
+				val[k]=1.0;
 			}
-			error= GRBaddconstr(moedl,dim,ind,val,GRB_EQUAL,1,NULL);
+			error= GRBaddconstr(model,dim,ind,val,GRB_EQUAL,1.0,NULL);
 			if(error){
 				printf("Error %d : in GRBaddconstr: %s\n", error, GRBgeterrormsg(env));
 				GRBfreemodel(model); // free model memory
@@ -211,10 +211,10 @@ int ILPSolver(void){
 	for(k=0;k<dim;k++){
 		for(j=0;j<dim;j++){
 			for(i=0;i<dim;i++){ //sum variable values over all the row
-				ind[i*dim*dim+j*dim+k]=i;
-				val[i]=1;
+				ind[i]=i*dim*dim+j*dim+k;
+				val[i]=1.0;
 			}
-			error= GRBaddconstr(moedl,dim,ind,val,GRB_EQUAL,1,NULL);
+			error= GRBaddconstr(model,dim,ind,val,GRB_EQUAL,1.0,NULL);
 			if(error){
 				printf("Error %d : in GRBaddconstr: %s\n", error, GRBgeterrormsg(env));
 				GRBfreemodel(model); // free model memory
@@ -229,10 +229,10 @@ int ILPSolver(void){
 	for(i=0;i<dim;i++){
 		for(k=0;k<dim;k++){
 			for(j=0;j<dim;j++){ //sum variable values over all the col
-				ind[i*dim*dim+j*dim+k]=j;
-				val[j]=1;
+				ind[j]=i*dim*dim+j*dim+k;
+				val[j]=1.0;
 			}
-			error= GRBaddconstr(moedl,dim,ind,val,GRB_EQUAL,1,NULL);
+			error= GRBaddconstr(model,dim,ind,val,GRB_EQUAL,1.0,NULL);
 			if(error){
 				printf("Error %d : in GRBaddconstr: %s\n", error, GRBgeterrormsg(env));
 				GRBfreemodel(model); // free model memory
@@ -244,6 +244,29 @@ int ILPSolver(void){
 
 
 	/*Add block constraints*/
+	for(k=0;k<dim;k++){
+		for(ii=0;ii<blockHeight;ii++){
+			for(jj=0;jj<blockWidth;jj++){
+				count=0;
+				for(i=ii*blockHeight; i<(ii+1)*blockHeight;i++){
+					for(j=jj*blockWidth;j<(jj+1)*blockWidth;j++){
+						ind[count]=i*dim*dim+j*dim+k;
+						val[count]=1.0;
+						count++;
+					}
+				}
+				error = GRBaddconstr(model,dim,ind,val,GRB_EQUAL,1.0,NULL);
+				if(error){
+					printf("Error %d : in GRBaddconstr: %s\n", error, GRBgeterrormsg(env));
+					GRBfreemodel(model); // free model memory
+					GRBfreeenv(env); // free environment memory
+					return 0;
+				} //end of if error
+
+			}
+
+		}
+	}
 
 
 	/*Add fixed-cell constraints*/
