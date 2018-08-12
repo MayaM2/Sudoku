@@ -386,7 +386,7 @@ switch(inpCommand->commands){
 					printf("Error: board is not empty\n");
 					break;
 				}
-				if(numInRange(inpCommand->arg1,0,dim*dim)&&numInRange(inpCommand->arg2,0,dim*dim)){ /* checks if X Y Z are in range 1-N, N=dim */
+				if(numInRange(inpCommand->arg1,0,dim*dim)&&numInRange(inpCommand->arg2,0,dim*dim)){ /* checks if X Y Z are in range 1-Dim*Dim */
 					/* in this case, we can generate a new board!! */
 					if(!generate(inpCommand->arg1,inpCommand->arg2, dim)){ //generation process
 						for(i=0;i<dim;i++){ // if fails - reclean board
@@ -465,7 +465,39 @@ switch(inpCommand->commands){
 		break;
 
 	case HINT_COMMAND:
-		/*use ILP */
+		if(gameMode == SOLVE){
+			 /* checks if any integers were given as X Y Z */
+				if(!((inpCommand->validity==1)&&(numInRange(inpCommand->arg1,0,dim)&&numInRange(inpCommand->arg2,0,dim)))){ // checks if X Y Z are integers in range 1-N, N=dim
+					printf("Error: value not in range 0-%d\n",dim);
+					return;
+				} // end of numbers not in range
+				if(isBoardErroneous()){ // case board is erroneous - don't execute
+					printf("Error: board contains erroneous values\n");
+					return;
+				}
+				if(fixed[inpCommand->arg1][inpCommand->arg1=2]==1){  // case cell is fixed - don't execute
+					printf("Error: cell is fixed\n");
+					return;
+
+				}
+				if(board[inpCommand->arg1][inpCommand->arg2]!=0){ // case cell is not empty - don't execute
+					printf("Error: cell already contains a value\n");
+					return;
+				}
+				i=ILPSolver();
+				if(!i){
+					printf("Error: board is unsolvable\n");
+					return;
+				}
+				else{
+					printf("Hint: set cell to %d\n",solvedBoard[inpCommand->arg1][inpCommand->arg2]);
+					return;
+				}
+			}
+		else{/* not in edit or solve mode */
+			printf("ERROR: invalid command\n");
+		}
+
 		break;
 
 	case NUMSOLUTIONS_COMMAND:
