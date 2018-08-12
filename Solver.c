@@ -188,13 +188,31 @@ int ILPSolver(void){
 	}
 
 	/*Add constrains: there are four kinds: rows, cols, block, fixed*/
-	/*Add row constraints*/
+	/*Add row constraints - for each i index*/
 
-	/*Add col constraints*/
+
+	/*Add col constraints - for each j index*/
 
 	/*Add block constraints*/
 
 	/*Add fixed-cell constraints*/
+	for(i=0;i<dim;i++){
+		for(j=0;j<dim;j++){
+			if(fixed[i][j]==1){ // if certain cell is set to be fixed
+				k=board[i][j];
+				ind[i*dim*dim+j*dim+k]=0;
+				val[0]=1; //coeff of constraint is 1
+				error = GRBaddconstr(model,1,ind,val,GRB_EQUAL,1.0,NULL); //add constraint: 1*X=1
+				// for the certain that's in the i*dim*dim+j*dim+k place in variables array.
+				if(error){
+					printf("Error %d : in GRBaddconstr: %s\n", error, GRBgeterrormsg(env));
+					GRBfreemodel(model); // free model memory
+					GRBfreeenv(env); // free environment memory
+					return 0;
+				} //end of if error
+			}
+		}
+	}
 
 	/*Optimize model*/
 	error = GRBoptimize(model);
