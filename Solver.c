@@ -119,21 +119,71 @@ void Autofill(int** board, UndoRedoList *urli, int blockHeight, int blockWidth)
  * Will update extern int** SolvedBoard accordingly.
  */
 int ILPSolver(void){
-	GRBenv *env = NULL;
-	GRBmodel *model = NULL;
+
+	GRBenv *env = NULL; //initialize environment
+	GRBmodel *model = NULL; //initialize model
+	// initialize program variables
 	int error = 0;
-	double sol[dim];
-	int ind[dim*dim];
-	int val[dim*dim];
-	int obj[dim*dim];
-	char vtype[dim*dim];
+	double sol[dim*dim*dim];
+	int ind[dim*dim*dim];
+	int val[dim*dim*dim];
+	int obj[dim*dim*dim]; //coeffs of obj. function
+	char vtype[dim*dim*dim];
 	int optimstatus;
 	double objval;
 	int zero=0;
+	int i=0;
+
+	/*Create environment*/
+	error = GRBloadenv(&env,""); //TODO - find out about logfiles in gurobi.
+	//here no log file will be written since an empty string was given.
+	if (error || env == NULL){
+		printf("Error %d : in GRBloadenv: %s\n", error, GRBgeterrormsg(env));
+		return 0;
+	}
+
+	/*Create empty model*/
+	error = GRBnewmodel(env,&model,"ILPSolve",0,NULL,NULL,NULL,NULL,NULL);
+	if (error || env == NULL){
+		printf("Error %d : in GRBnewmodel: %s\n", error, GRBgeterrormsg(env));
+		return 0;
+	}
+
+	/*Add variables*/
+	for(i=0; i<dim*dim*dim;i++){
+		obj[i]=1;
+		vtype[i]=GRB_BINARY;
+	}
+	error = GRBaddvars(model,dim*dim*dim,0,NULL,NULL,NULL,obj,NULL,NULL,vtype,NULL);
+	if(error){
+		printf("Error %d : in GRBaddvars: %s\n", error, GRBgeterrormsg(env));
+		return 0;
+	}
+
+	/*change objective sense to maximization - default is min*/
+	error = GRBsetintattr(model, GRB_INT_ATTR_MODELSENSE, GRB_MAXIMIZE);
+	if(error){
+		printf("Error %d : in GRBsetintattr: %s\n", error, GRBgeterrormsg(env));
+		return 0;
+	}
+
+	/*Add constrains: there are four kinds: rows, cols, block, fixed*/
+	/*Add row constraints*/
+
+	/*Add col constraints*/
+
+	/*Add block constraints*/
+
+	/*Add fixed-cell constraints*/
+
+	/*Optimize model*/
+
+	/*Capture solution information*/
 
 
 
 
+	/*Free model*/
 	GRBfreemodel(model); // free model memory
 	GRBfreeenv(env); // free environment memory
 	return 0;
