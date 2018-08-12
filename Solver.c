@@ -177,9 +177,25 @@ int ILPSolver(void){
 	/*Add fixed-cell constraints*/
 
 	/*Optimize model*/
+	error = GRBoptimize(model);
+	if(error){
+		printf("Error %d : in GRBoptimize: %s\n", error, GRBgeterrormsg(env));
+		return 0;
+	}
 
 	/*Capture solution information*/
+	error = GRBgetintattr(model, GRB_INT_ATTR_STATUS,&optimstatus); //query the status of the optimization process
+	// by retrieving the values of the status attribute.
+	if(error){
+		printf("Error %d : in GRBgetintattr: %s\n", error, GRBgeterrormsg(env));
+		return 0;
+	}
 
+	error = GRBgetdblattr(model, GRB_DBL_ATTR_OBJVAL, &objval);
+	if(error){
+		printf("Error %d : in GRBgetdblattr: %s\n", error, GRBgeterrormsg(env));
+		return 0;
+	}
 
 
 
