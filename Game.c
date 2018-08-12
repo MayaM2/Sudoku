@@ -396,6 +396,9 @@ switch(inpCommand->commands){
 						}
 						printf("Error: puzzle generator failed\n");
 					}
+					else{//puzzle generation successful
+						printBoard(board);
+					}
 				}	// end of numbers in range
 				else{ // numbers are not in range
 					printf("Error: value not in range 0-%d\n",dim*dim);
