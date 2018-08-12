@@ -7,6 +7,7 @@
 
 int **board=NULL;
 int **fixed=NULL;
+int**solvedBoard=NULL;
 int blockHeight;
 int blockWidth;
 int dim;
@@ -150,10 +151,12 @@ void MainMemoryCreator()
 	/*new allocation*/
 	board=(int**)calloc(dim,sizeof(int*));
 	fixed=(int**)calloc(dim,sizeof(int*));
+	solvedBoard=(int**)calloc(dim,sizeof(int*));
 	undoRedo=undoRedoCreator();
 	for(i=0;i<dim;i++){
 		board[i]=(int*)calloc(dim,sizeof(int));
 		fixed[i]=(int*)calloc(dim,sizeof(int));
+		solvedBoard[i]=(int*)calloc(dim,sizeof(int));
 	}
 }
 
