@@ -1,0 +1,20 @@
+/*
+ * Enums.h
+ *
+ *  Created on: 11 במאי 2018
+ *      Author: User
+ */
+
+#ifndef ENUMS_H_
+#define ENUMS_H_
+
+# define printErrorMessage(functionName){ \
+	printf("Error: %s has failed\n", functionName);\
+}
+enum errors {FATAL_ERROR=300, VALIDATION_ERROR=200, WIN_COMMAND=100};
+
+enum commands {SOLVE_COMMAND,EDIT_COMMAND,RESET_COMMAND,EXIT_COMMAND,MARKERRORS_COMMAND,PRINTBOARD_COMMAND,SET_COMMAND,VALIDATE_COMMAND,GENERATE_COMMAND,UNDO_COMMAND,REDO_COMMAND,SAVE_COMMAND,HINT_COMMAND,NUMSOLUTIONS_COMMAND,AUTOFILL_COMMAND,INVALID_COMMAND,IGNORE_COMMAND};
+enum gameMode {INIT,EDIT,SOLVE};
+
+
+#endif /* ENUMS_H_ */

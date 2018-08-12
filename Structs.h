@@ -1,0 +1,117 @@
+
+/*
+ * Command
+ */
+typedef struct Command{
+	int commands;
+	int validity; /* until said otherwise */
+	int arg1;
+	int arg2;
+	int arg3;
+	char* fileName;
+} Command;
+
+
+/*
+ * Constructor
+ */
+Command* commandCreator(int commands, int validity, int arg1, int arg2, int arg3);
+/*
+ * Destructor
+ */
+void commandDestructor(Command * c);
+
+/*
+ * Load file List - to save info from file read for board creation in main
+ */
+typedef struct lfNode{
+	struct lfNode* next;
+	int row;
+	int col;
+	int val;
+	int isFixed;
+} LoadFileNode;
+
+typedef struct lfList{
+	LoadFileNode* head;
+	LoadFileNode* curr;
+	int colsPerBlock;
+	int rowsPerBlock;
+} LoadFileList;
+LoadFileList* LFLCreator();
+void LFLDestructor(LoadFileList *li);
+void LFLAppend(LoadFileList *li, int row, int col, int val, int isFixed);
+
+/*
+ * Undo-Redo List
+ */
+typedef struct urNode{
+	struct urNode* prev;
+	struct urNode* next;
+	int row;
+	int col;
+	int oldVal;
+	int newVal;
+	int isAutofilled;
+} UndoRedoNode;
+
+typedef struct urList{
+	UndoRedoNode* head;
+	UndoRedoNode* tail;
+	UndoRedoNode* curr;
+} UndoRedoList;
+
+/*
+ * Constructor
+ */
+UndoRedoList* undoRedoCreator();
+/*
+ * Destructor
+ */
+void undoRedoDestroyer(UndoRedoList* li);
+/*
+ * create and append new node to undoredo list. if there are nodes following current node, remove them before appending.
+ */
+void undoRedoAppend(UndoRedoList* li,int row, int col, int oldVal, int newVal, int isAutofilled);
+
+
+/*
+ * num-solutions Stack
+ */
+typedef struct stackNode{
+	struct stackNode* prev;
+	struct stackNode* next;
+	int row;
+	int col;
+	int isForward;
+	int** board;
+} RecStackNode;
+
+typedef struct stack{
+	RecStackNode* head;
+} RecStack;
+
+/*
+ * Creator
+ */
+RecStack* recStackCreator();
+/*
+ * Destructor
+ */
+void recStackDestroyer(RecStack* r);
+/*
+ * create and push new node into stack (ie- add to FRONT of list).
+ */
+void recStackPush(RecStack* r, RecStackNode* n);
+/*
+ * create stack node;
+ */
+RecStackNode* recStackNodeCreator(int row, int col, int isForward, int** board);
+/*
+ * return and update head of stack
+ */
+RecStackNode* recStackPop(RecStack* r);
+
+
+
+
