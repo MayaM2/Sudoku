@@ -155,6 +155,9 @@ int allfilled(int** board, int dim){
 	return 1;
 }
 
+/*
+ * Returns 1 if board is empty, 0 otherwise
+ */
 int isBoardEmpty(int** board, int dim){
 	int i=0,j=0;
 	for(i=0;i<dim;i++){
@@ -383,7 +386,7 @@ switch(inpCommand->commands){
 					}
 				}	// end of numbers in range
 				else{ // numbers are not in range
-					printf("Error: value not in range 0-%d\n",dim);
+					printf("Error: value not in range 0-%d\n",dim*dim);
 					return;
 				}
 			}
