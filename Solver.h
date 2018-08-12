@@ -10,7 +10,6 @@
 
 void Autofill(int** board, UndoRedoList *urli, int blockHeight, int blockWidth);
 
-
 int ILPSolver();
 
 #endif /* SOLVER_H_ */
