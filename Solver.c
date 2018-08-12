@@ -242,8 +242,8 @@ int ILPSolver(void){
 		for (i=0; i<dim; i++){ //cols
 			for(j=0;j<dim; j++){ //rows
 				for(k=0; k<dim;k++){ //values from 0 to dim-1
-					if(intSol[i*k+j]==1){
-						solvedBoard[i][j]==(k+1);
+					if(intSol[i*dim*dim+j*dim+k]==1){
+						solvedBoard[i][j]=(k+1); //sets the value to the cell
 					}
 				}
 			}
