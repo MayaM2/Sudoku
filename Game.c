@@ -248,6 +248,16 @@ void printsForRedoUndo(int isUndo, int row, int col, int num1, int num2)
 }
 
 /*
+ * Generates a new puzzle out of an empty board.
+ * Randomly choose x cells. Run ILPSolver (uo tp 1000 times if needed)
+ * randomly choose y cells and delete them.
+ * return 1 if succeeded, 0 otherwise.
+ */
+int generate(int x, int y, int dim){
+	return 0;
+}
+
+/*
  *doCommand - checks type of command using switch case. Checks validity and prints error message if needed, else - calls corresponding function.
  */
 void doCommand(Command* inpCommand){
@@ -378,11 +388,13 @@ switch(inpCommand->commands){
 				}
 				if(numInRange(inpCommand->arg1,0,dim*dim)&&numInRange(inpCommand->arg2,0,dim*dim)){ /* checks if X Y Z are in range 1-N, N=dim */
 					/* in this case, we can generate a new board!! */
-					generate(inpCommand->arg1,inpCommand->arg2);
-					for(i=0;i<dim;i++){ //update game-board to the generated one saved at solved board
-						for(j=0;j<dim;j++){
-							board[i][j]=solvedBoard[i][j];
+					if(!generate(inpCommand->arg1,inpCommand->arg2, dim)){ //generation process
+						for(i=0;i<dim;i++){ // if fails - reclean board
+							for(j=0;j<dim;j++){
+								board[i][j]=0;
+							}
 						}
+						printf("Error: puzzle generator failed\n");
 					}
 				}	// end of numbers in range
 				else{ // numbers are not in range
