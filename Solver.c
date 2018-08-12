@@ -7,6 +7,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
 #include "Enums.h"
 #include "Structs.h"
 
@@ -125,6 +126,7 @@ int ILPSolver(void){
 	// initialize program variables
 	int error = 0;
 	double sol[dim*dim*dim];
+	int intSol[dim*dim*dim];
 	int ind[dim*dim*dim];
 	int val[dim*dim*dim];
 	int obj[dim*dim*dim]; //coeffs of obj. function
@@ -132,13 +134,15 @@ int ILPSolver(void){
 	int optimstatus;
 	double objval;
 	int zero=0;
-	int i=0;
+	int i=0, j=0, k=0;
 
 	/*Create environment*/
 	error = GRBloadenv(&env,""); //TODO - find out about logfiles in gurobi.
 	//here no log file will be written since an empty string was given.
 	if (error || env == NULL){
 		printf("Error %d : in GRBloadenv: %s\n", error, GRBgeterrormsg(env));
+		GRBfreemodel(model); // free model memory
+		GRBfreeenv(env); // free environment memory
 		return 0;
 	}
 
@@ -146,6 +150,8 @@ int ILPSolver(void){
 	error = GRBnewmodel(env,&model,"ILPSolve",0,NULL,NULL,NULL,NULL,NULL);
 	if (error || env == NULL){
 		printf("Error %d : in GRBnewmodel: %s\n", error, GRBgeterrormsg(env));
+		GRBfreemodel(model); // free model memory
+		GRBfreeenv(env); // free environment memory
 		return 0;
 	}
 
@@ -157,6 +163,8 @@ int ILPSolver(void){
 	error = GRBaddvars(model,dim*dim*dim,0,NULL,NULL,NULL,obj,NULL,NULL,vtype,NULL);
 	if(error){
 		printf("Error %d : in GRBaddvars: %s\n", error, GRBgeterrormsg(env));
+		GRBfreemodel(model); // free model memory
+		GRBfreeenv(env); // free environment memory
 		return 0;
 	}
 
@@ -164,6 +172,18 @@ int ILPSolver(void){
 	error = GRBsetintattr(model, GRB_INT_ATTR_MODELSENSE, GRB_MAXIMIZE);
 	if(error){
 		printf("Error %d : in GRBsetintattr: %s\n", error, GRBgeterrormsg(env));
+		GRBfreemodel(model); // free model memory
+		GRBfreeenv(env); // free environment memory
+		return 0;
+	}
+
+
+	/*Update model - to integrate new variables*/
+	error = GRBupdatemodel(model);
+	if(error){
+		printf("Error %d : in GRBupdatemodel: %s\n", error, GRBgeterrormsg(env));
+		GRBfreemodel(model); // free model memory
+		GRBfreeenv(env); // free environment memory
 		return 0;
 	}
 
@@ -180,6 +200,8 @@ int ILPSolver(void){
 	error = GRBoptimize(model);
 	if(error){
 		printf("Error %d : in GRBoptimize: %s\n", error, GRBgeterrormsg(env));
+		GRBfreemodel(model); // free model memory
+		GRBfreeenv(env); // free environment memory
 		return 0;
 	}
 
@@ -188,23 +210,58 @@ int ILPSolver(void){
 	// by retrieving the values of the status attribute.
 	if(error){
 		printf("Error %d : in GRBgetintattr: %s\n", error, GRBgeterrormsg(env));
+		GRBfreemodel(model); // free model memory
+		GRBfreeenv(env); // free environment memory
 		return 0;
 	}
 
 	error = GRBgetdblattr(model, GRB_DBL_ATTR_OBJVAL, &objval);
 	if(error){
 		printf("Error %d : in GRBgetdblattr: %s\n", error, GRBgeterrormsg(env));
+		GRBfreemodel(model); // free model memory
+		GRBfreeenv(env); // free environment memory
 		return 0;
 	}
 
 	error = GRBgetdblattarray(model,GRB_DBL_ATTR_X,0,dim*dim*dim,sol);
 	if(error){
 		printf("Error %d : in GRBgetdblattarray: %s\n", error, GRBgeterrormsg(env));
+		GRBfreemodel(model); // free model memory
+		GRBfreeenv(env); // free environment memory
 		return 0;
 	}
 
+	//case an optimum was found
+	if(optimstatus == GRB_OPTIMAL){
+		//update intSol to int values of double sol array
+		for(i=0;i<dim*dim*dim;i++){
+					intSol[i]= floor(sol[i]);
+		}
 
+		//update solvedBoard according to sol array
+		for (i=0; i<dim; i++){ //cols
+			for(j=0;j<dim; j++){ //rows
+				for(k=0; k<dim;k++){ //values from 0 to dim-1
+					if(intSol[i*k+j]==1){
+						solvedBoard[i][j]==(k+1);
+					}
+				}
+			}
+		}
+		GRBfreemodel(model); // free model memory
+		GRBfreeenv(env); // free environment memory
+		return 1;
+	}
 
+	// case of infinite or unbounded solution
+	if(optimstatus == GRB_INF_OR_UNBD){
+		printf("Unsolvable\n");
+		GRBfreemodel(model); // free model memory
+		GRBfreeenv(env); // free environment memory
+		return -1;
+	}
+
+	//case there was a runtime problem
 	/*Free model*/
 	GRBfreemodel(model); // free model memory
 	GRBfreeenv(env); // free environment memory
