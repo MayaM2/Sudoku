@@ -111,9 +111,9 @@ int numInRange(int num, int lower, int upper){
 
 /* returns 1 if validation passed, 0 otherwise*/
 /* will print to user only if int printMessages == 1*/
-int validate(int** board,int blockHeight, int blockWidth, int dim, int printMessages)
+int validate(int** board,int blockHeight, int blockWidth, int dim, int printMessage)
 {
-	if(gameMode == SAVE || gemeMode==EDIT){
+	if(gameMode == SOLVE || gameMode==EDIT){
 		int passed = 0;
 		if(isBoardErroneous()){
 			printf("Error: board contains erroneous values\n");
@@ -121,13 +121,13 @@ int validate(int** board,int blockHeight, int blockWidth, int dim, int printMess
 		}
 		passed = ILPSolver();
 		if(passed){
-			if(printMaggages){
+			if(printMessage){
 				printf("Validation passed: board is solvable\n");
 			}
 			return 1;
 		}
 		else{
-			if(printMassage){
+			if(printMessage){
 				printf("Validation failed: board is not solvable\n");
 			}
 			return 0;
@@ -145,6 +145,7 @@ int validate(int** board,int blockHeight, int blockWidth, int dim, int printMess
  * 0 otherwise.
  */
 int allfilled(int** board, int dim){
+	int i=0,j=0;
 	for (int i = 0; i < dim; i++){
 	  for (int j = 0; j < dim; j++){
 		  if(board[i][j] ==0)
@@ -153,6 +154,19 @@ int allfilled(int** board, int dim){
 	}
 	return 1;
 }
+
+int isBoardEmpty(int** board, int dim){
+	int i=0,j=0;
+	for(i=0;i<dim;i++){
+		for(j=0;j<dim;j++){
+			if(board[i][j]!=0){
+				return 0;
+			}
+		}
+	}
+	return 1;
+}
+
 
 /*
  * "Hidden" functions- Freer frees old memory, Creator calls freer and creates new.
@@ -234,7 +248,7 @@ void printsForRedoUndo(int isUndo, int row, int col, int num1, int num2)
  *doCommand - checks type of command using switch case. Checks validity and prints error message if needed, else - calls corresponding function.
  */
 void doCommand(Command* inpCommand){
-	int i=0;
+	int i=0,j=0;
 switch(inpCommand->commands){
 
 	case SOLVE_COMMAND:
@@ -351,8 +365,32 @@ switch(inpCommand->commands){
 	case VALIDATE_COMMAND: /*DONE*/
 		validate(board,blockHeight,blockWidth,dim,1);
 		break;
+
 	case GENERATE_COMMAND:
-		/*use ILP */
+		if(gameMode == EDIT){
+			if(inpCommand->validity==1){ /* checks if any integers were given as X Y Z */
+				if(!isBoardEmpty(board,dim)){
+					printf("Error: board is not empty\n");
+					break;
+				}
+				if(numInRange(inpCommand->arg1,0,dim*dim)&&numInRange(inpCommand->arg2,0,dim*dim)){ /* checks if X Y Z are in range 1-N, N=dim */
+					/* in this case, we can generate a new board!! */
+					generate(inpCommand->arg1,inpCommand->arg2);
+					for(i=0;i<dim;i++){ //update game-board to the generated one saved at solved board
+						for(j=0;j<dim;j++){
+							board[i][j]=solvedBoard[i][j];
+						}
+					}
+				}	// end of numbers in range
+				else{ // numbers are not in range
+					printf("Error: value not in range 0-%d\n",dim);
+					return;
+				}
+			}
+		}
+		else{/* not in edit or solve mode */
+			printf("ERROR: invalid command\n");
+		}
 		break;
 
 	case UNDO_COMMAND:
