@@ -119,7 +119,7 @@ void Autofill(int** board, UndoRedoList *urli, int blockHeight, int blockWidth)
  * Will return 1 if there is a solution, -1 if there is no solution, or 0 if there was a runtime problem.
  * Will update extern int** SolvedBoard accordingly.
  */
-int ILPSolver(void){
+int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockWidth, int dim){
 
 	GRBenv *env = NULL; //initialize environment
 	GRBmodel *model = NULL; //initialize model

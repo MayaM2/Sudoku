@@ -119,7 +119,7 @@ int validate(int** board,int blockHeight, int blockWidth, int dim, int printMess
 			printf("Error: board contains erroneous values\n");
 			return 0;
 		}
-		passed = ILPSolver();
+		passed = ILPSolver(ILPSolver(board,fixed,solvedBoard,blockHeight,blockWidth,dim));
 		if(passed){
 			if(printMessage){
 				printf("Validation passed: board is solvable\n");
@@ -253,7 +253,7 @@ void printsForRedoUndo(int isUndo, int row, int col, int num1, int num2)
  * randomly choose y cells and delete them.
  * return 1 if succeeded, 0 otherwise.
  */
-int generate(int x, int y, int dim){
+int generate(int x, int y, int dim){ //TODO
 	return 0;
 }
 
@@ -484,7 +484,7 @@ switch(inpCommand->commands){
 					printf("Error: cell already contains a value\n");
 					return;
 				}
-				i=ILPSolver();
+				i=ILPSolver(board,fixed,solvedBoard,blockHeight,blockWidth,dim);
 				if(!i){
 					printf("Error: board is unsolvable\n");
 					return;
