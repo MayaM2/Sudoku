@@ -149,8 +149,10 @@ void ParseCommand(Command *currCommand){
 	/*
 	 * in case no command was detected
 	 */
-	else if(currCommand->commands==-1){
+	else {
 		currCommand->commands=INVALID_COMMAND;
 	}
+	if(currCommand->validity==0)
+		currCommand->commands=INVALID_COMMAND;
  }
 
