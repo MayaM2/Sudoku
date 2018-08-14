@@ -104,7 +104,7 @@ void undoRedoDestroyer(UndoRedoList* li){
 	free(li);
 }
 
-void undoRedoAppend(UndoRedoList* li,int row, int col, int oldVal, int newVal, int isAutofilled)
+void undoRedoAppend(UndoRedoList* li,int row, int col, int oldVal, int newVal, int isAutofilled, int isStarter)
 {
 	UndoRedoNode* n;
 	UndoRedoList* dummy;
@@ -114,6 +114,7 @@ void undoRedoAppend(UndoRedoList* li,int row, int col, int oldVal, int newVal, i
 	n->oldVal=oldVal;
 	n->newVal=newVal;
 	n->isAutofilled=isAutofilled;
+	n->isAutofillStarter=isStarter;
 
 	/*
 	 * if current node has next, we should delete all values following current node. in any case, append new node
@@ -144,18 +145,33 @@ RecStack* recStackCreator(){
 }
 
 /*
- * "Hidden" func- destroy stack nodes.
+ * destroy stack nodes.
  */
 void destroyStackNode(RecStackNode* n){
 	if(n!=NULL){
 		destroyStackNode(n->next);
-		free(n->board);
+		free(n->neighborsBin);
 		free(n);
 	}
 }
 void recStackDestroyer(RecStack* r){
 	destroyStackNode(r->head);
 	free(r);
+}
+RecStackNode* recStackNodeCreator(int row, int col, int isForward, int* bin, int dim)
+{
+	RecStackNode* n;
+	int i=0;
+	n=(RecStackNode*)calloc(1,sizeof(RecStackNode));
+	n->neighborsBin=(int*)calloc(dim, sizeof(int));
+	for(i=0;i<dim;i++)
+		n->neighborsBin[i]=bin[i];
+	n->col=col;
+	n->isForward=isForward;
+	n->next=NULL;
+	n->prev=NULL;
+	n->row=row;
+	return n;
 }
 
 void recStackPush(RecStack* r, RecStackNode* n)
@@ -171,18 +187,13 @@ void recStackPush(RecStack* r, RecStackNode* n)
 		r->head=n;
 	}
 }
-RecStackNode* recStackNodeCreator(int row, int col, int isForward, int** board)
+
+void recStackPushInfo(RecStack* r, int row, int col, int isForward, int* bin, int dim)
 {
-	RecStackNode* n;
-	n=(RecStackNode*)calloc(1,sizeof(RecStackNode));
-	n->board=board;
-	n->col=col;
-	n->isForward=isForward;
-	n->next=NULL;
-	n->prev=NULL;
-	n->row=row;
-	return n;
+	recStackPush(r,recStackNodeCreator(row,col,isForward,bin,dim));
 }
+
+
 RecStackNode* recStackPop(RecStack* r)
 {
 	RecStackNode* n;
