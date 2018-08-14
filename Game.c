@@ -248,6 +248,17 @@ void printsForRedoUndo(int isUndo, int row, int col, int num1, int num2)
 }
 
 
+
+/*
+ *
+ */
+int problemCellAssignment(int i, int j){
+	return 1;
+}
+
+
+
+
 /*
  * recieve int X, and two int arrays in length X, that represent row and col coordinates
  * of X different cells in the game board. try to fill these cells with valid values.
@@ -255,10 +266,20 @@ void printsForRedoUndo(int isUndo, int row, int col, int num1, int num2)
  * otherwise - a valid assignment was found - return 1.
  */
 int randomFill(int X,int *arri,int *arrj){
-	int i=0, j=0, k=0;
-	k = rand() % dim
-
-	return 0;
+	int k=0, count=0, failed=0;
+	while(count<X){
+		k = (rand() % dim)+1; // first try any random number for cell, from range 1-dim
+		board[arri[count]][arrj[count]]=k;
+		if(isBoardErroneous()){ // there was a problem with the first try of cell's assignment
+			failed = !(problemCellAssignment(arri[count],arrj[count])); // try randomly all options.
+			if(failed==1){
+				return 0; // reached a dead end
+			}
+		}
+		count++;
+	}
+	// case all X cells were filled
+	return 1;
 }
 
 
