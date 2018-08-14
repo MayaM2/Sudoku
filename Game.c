@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 #include "Enums.h"
 #include "Structs.h"
 #include "IOmod.h"
@@ -247,14 +248,47 @@ void printsForRedoUndo(int isUndo, int row, int col, int num1, int num2)
 	printf("\n");
 }
 
+
 /*
  * Generates a new puzzle out of an empty board.
  * Randomly choose x cells. Run ILPSolver (uo tp 1000 times if needed)
  * randomly choose y cells and delete them.
+ * update the game board
  * return 1 if succeeded, 0 otherwise.
  */
-int generate(int x, int y, int dim){ //TODO
-	return 0;
+int generate(int X, int Y, int dim){
+	int tries=0;
+	int step1Success = 0;
+	int randCount = 0;
+	int arri[X];
+	int arrj[X];
+	int arrk[X];
+	//step 1: up to 1,000 tries: choose X cells, fill them randomly with valid values and try to solve using ILP
+	while(!step1Success && tries<1000){
+		while(randCount<X){
+			arri[randCount] = rand() % dim*dim; // [i][j] coordinated are between  0 - (dim-1)
+			arrj[randCount] = rand() % dim*dim;
+			if(board[arri[randCount]][arrj[randCount]]==0){ //cell was not already chosen..
+				randCount++;
+				board[arri[randCount]][arrj[randCount]]=1;
+			}
+		}//now X cells were randomly chosen
+
+		//next - we'll try to fill them randomly with valid values
+
+
+
+		tries++;//if no success.. count this as a try.
+	}
+	if(!step1Success){
+		printf("Error: puzzle generation failed\n");
+		return 0;
+	}
+	// continue to step 2: erase Y randomly chosen cells and clear their value. Print board,
+
+
+	printBoard();
+	return 1;
 }
 
 /*
@@ -548,12 +582,4 @@ switch(inpCommand->commands){
 		break;
 }
 }
-
-/*
-int generate();
-
-int hint();
-*/
-
-
 
