@@ -285,6 +285,7 @@ int numSols(int** board, int blockHeight, int blockWidth)
  * Will return 1 if there is a solution, -1 if there is no solution, or 0 if there was a runtime problem.
  * Will update extern int** SolvedBoard accordingly.
  */
+
 int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockWidth, int dim){
 
 	GRBenv *env = NULL; //initialize environment
@@ -302,7 +303,7 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 	int zero=0;
 	int i=0, j=0, k=0, ii=0,jj=0,count=0;
 
-	/*Create environment*/
+	//Create environment
 	error = GRBloadenv(&env,""); //TODO - find out about logfiles in gurobi.
 	//here no log file will be written since an empty string was given.
 	if (error || env == NULL){
@@ -312,7 +313,7 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 		return 0;
 	}
 
-	/*Create empty model*/
+	//Create empty model
 	error = GRBnewmodel(env,&model,"ILPSolve",0,NULL,NULL,NULL,NULL,NULL);
 	if (error || env == NULL){
 		printf("Error %d : in GRBnewmodel: %s\n", error, GRBgeterrormsg(env));
@@ -321,7 +322,7 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 		return 0;
 	}
 
-	/*Add variables*/
+	//Add variables
 	for(i=0; i<dim*dim*dim;i++){
 		obj[i]=1;
 		vtype[i]=GRB_BINARY;
@@ -334,7 +335,7 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 		return 0;
 	}
 
-	/*change objective sense to maximization - default is min*/
+	//change objective sense to maximization - default is min
 	error = GRBsetintattr(model, GRB_INT_ATTR_MODELSENSE, GRB_MAXIMIZE);
 	if(error){
 		printf("Error %d : in GRBsetintattr: %s\n", error, GRBgeterrormsg(env));
@@ -344,7 +345,7 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 	}
 
 
-	/*Update model - to integrate new variables*/
+	//Update model - to integrate new variables
 	error = GRBupdatemodel(model);
 	if(error){
 		printf("Error %d : in GRBupdatemodel: %s\n", error, GRBgeterrormsg(env));
@@ -353,9 +354,9 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 		return 0;
 	}
 
-	/*Add constrains: there are five kinds: cells, rows, cols, block, fixed*/
+	//Add constrains: there are five kinds: cells, rows, cols, block, fixed
 
-	/*Add cell constraints - for each [i,j] cell, only allow to hold one value*/
+	//Add cell constraints - for each [i,j] cell, only allow to hold one value
 	for(i=0;i<dim;i++){
 		for(j=0;j<dim;j++){
 			for(k=0;k<dim;k++){ //sum variable values over all possible k's for specific [i,j]
@@ -373,7 +374,7 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 	}// go through all possible [i,j]
 
 
-	/*Add row constraints - for each i index*/
+	//Add row constraints - for each i index
 	for(k=0;k<dim;k++){
 		for(j=0;j<dim;j++){
 			for(i=0;i<dim;i++){ //sum variable values over all the row
@@ -391,7 +392,7 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 	}// go through all possible [i,j]
 
 
-	/*Add col constraints - for each j index*/
+	//Add col constraints - for each j index
 	for(i=0;i<dim;i++){
 		for(k=0;k<dim;k++){
 			for(j=0;j<dim;j++){ //sum variable values over all the col
@@ -409,7 +410,7 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 	}// go through all possible [i,j]
 
 
-	/*Add block constraints*/
+	//Add block constraints
 	for(k=0;k<dim;k++){
 		for(ii=0;ii<blockHeight;ii++){
 			for(jj=0;jj<blockWidth;jj++){
@@ -435,7 +436,7 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 	}
 
 
-	/*Add fixed-cell constraints*/
+	//Add fixed-cell constraints
 	for(i=0;i<dim;i++){
 		for(j=0;j<dim;j++){
 			if(fixed[i][j]==1){ // if certain cell is set to be fixed
@@ -454,7 +455,7 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 		}
 	}
 
-	/*Optimize model*/
+	//Optimize model
 	error = GRBoptimize(model);
 	if(error){
 		printf("Error %d : in GRBoptimize: %s\n", error, GRBgeterrormsg(env));
@@ -463,7 +464,7 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 		return 0;
 	}
 
-	/*Capture solution information*/
+	//Capture solution information
 	error = GRBgetintattr(model, GRB_INT_ATTR_STATUS,&optimstatus); //query the status of the optimization process
 	// by retrieving the values of the status attribute.
 	if(error){
@@ -520,7 +521,7 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 	}
 
 	//case there was a runtime problem
-	/*Free model*/
+	//Free model
 	GRBfreemodel(model); // free model memory
 	GRBfreeenv(env); // free environment memory
 	return 0;
