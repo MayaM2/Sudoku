@@ -1,3 +1,5 @@
+#ifndef STRUCTS_H_
+#define STRUCTS_H_
 
 /*
  * Command
@@ -53,6 +55,7 @@ typedef struct urNode{
 	int oldVal;
 	int newVal;
 	int isAutofilled;
+	int isAutofillStarter;
 } UndoRedoNode;
 
 typedef struct urList{
@@ -72,7 +75,7 @@ void undoRedoDestroyer(UndoRedoList* li);
 /*
  * create and append new node to undoredo list. if there are nodes following current node, remove them before appending.
  */
-void undoRedoAppend(UndoRedoList* li,int row, int col, int oldVal, int newVal, int isAutofilled);
+void undoRedoAppend(UndoRedoList* li,int row, int col, int oldVal, int newVal, int isAutofilled, int isStarter);
 
 
 /*
@@ -84,7 +87,7 @@ typedef struct stackNode{
 	int row;
 	int col;
 	int isForward;
-	int** board;
+	int* neighborsBin;
 } RecStackNode;
 
 typedef struct stack{
@@ -98,20 +101,22 @@ RecStack* recStackCreator();
 /*
  * Destructor
  */
+void destroyStackNode(RecStackNode* n);
 void recStackDestroyer(RecStack* r);
 /*
- * create and push new node into stack (ie- add to FRONT of list).
+ * create and push new node into stack (ie- add to FRONT of list). 1st one gets a node and adds, second
+ * creates new node with given info and calls first.
  */
 void recStackPush(RecStack* r, RecStackNode* n);
+void recStackPushInfo(RecStack* r, int row, int col, int isForward, int* bin, int dim);
 /*
  * create stack node;
  */
-RecStackNode* recStackNodeCreator(int row, int col, int isForward, int** board);
+RecStackNode* recStackNodeCreator(int row, int col, int isForward, int* bin, int dim);
 /*
  * return and update head of stack
  */
 RecStackNode* recStackPop(RecStack* r);
 
-
-
+#endif /* STRUCTS_H_ */
 
