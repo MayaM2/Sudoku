@@ -256,7 +256,35 @@ void printsForRedoUndo(int isUndo, int row, int col, int num1, int num2)
  * 0 otherwise.
  */
 int problemCellAssignment(int i, int j){
-	return 1;
+	int numOptions = dim;
+	int x=0,count=0,ind=0;
+	int OpArr[dim];
+	// Initialize OpArr with zeroes
+	for(int x=0; x<dim;x++){
+		OpArr[x]=1;
+	}
+
+	while(numOptions>0){ // while there are still value options to try
+		x = rand() % numOptions; // x between 0 and (numOptions-1)
+		// we will want to go to the x'th index in OpArr that has value 1
+		count = 0;
+		ind=0;
+		while(count < x){
+			if(OpArr[ind]==1){
+				count++;
+			}
+			ind++; // we need i+1 which represents the actual value
+		}
+		// try and put value in cell
+		board[i][j]=ind;
+		if(!isBoardErroneous()){
+			return 1; // successful
+		}
+		// case not successful
+		OpArr[ind-1]=0; // delete option
+		numOptions--;
+	}
+	return 0; // we went through all options for values, and they were all unsuccessful
 }
 
 
