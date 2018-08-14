@@ -250,16 +250,18 @@ void printsForRedoUndo(int isUndo, int row, int col, int num1, int num2)
 
 
 /*
- *
+ * to be used by randomFill function.
+ * Deals with situations were first random assignment of value to board[i][j] was not valid.
+ * returns 1 if successful random value assignment was found
+ * 0 otherwise.
  */
 int problemCellAssignment(int i, int j){
 	return 1;
 }
 
 
-
-
 /*
+ * to be used by generate function.
  * recieve int X, and two int arrays in length X, that represent row and col coordinates
  * of X different cells in the game board. try to fill these cells with valid values.
  * if reached a cell that has no legal value available, mission failed - return 0.
@@ -349,7 +351,7 @@ int generate(int X, int Y, int dim){
 	while(randCount<Y){
 		arri[randCount] = rand() % dim*dim; // [i][j] coordinated are between  0 - (dim-1)
 		arrj[randCount] = rand() % dim*dim;
-		if((board[arri[randCount]][arrj[randCount]]==0)){ //cell was not already chosen..
+		if(!(board[arri[randCount]][arrj[randCount]]==0)){ //cell was not already chosen..
 			randCount++;
 			board[arri[randCount]][arrj[randCount]]=0;
 		}
