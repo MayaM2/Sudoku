@@ -98,7 +98,6 @@ void printBoard()
 }
 
 
-
 /*
  * returns 1 if a given num is between lower and upper given numbers inclusively.
  * 0 therwise.
@@ -250,6 +249,20 @@ void printsForRedoUndo(int isUndo, int row, int col, int num1, int num2)
 
 
 /*
+ * recieve int X, and two int arrays in length X, that represent row and col coordinates
+ * of X different cells in the game board. try to fill these cells with valid values.
+ * if reached a cell that has no legal value available, mission failed - return 0.
+ * otherwise - a valid assignment was found - return 1.
+ */
+int randomFill(int X,int *arri,int *arrj){
+	int i=0, j=0, k=0;
+	k = rand() % dim
+
+	return 0;
+}
+
+
+/*
  * Generates a new puzzle out of an empty board.
  * Randomly choose x cells. Run ILPSolver (uo tp 1000 times if needed)
  * randomly choose y cells and delete them.
@@ -270,8 +283,8 @@ int generate(int X, int Y, int dim){
 		randCount = 0;
 		cellAssignSuccesss = 0;
 		while(randCount<X){
-			arri[randCount] = rand() % dim*dim; // [i][j] coordinated are between  0 - (dim-1)
-			arrj[randCount] = rand() % dim*dim;
+			arri[randCount] = rand() % dim; // [i][j] coordinated are between  0 - (dim-1)
+			arrj[randCount] = rand() % dim;
 			if(board[arri[randCount]][arrj[randCount]]==0){ //cell was not already chosen..
 				randCount++;
 				board[arri[randCount]][arrj[randCount]]=1;
