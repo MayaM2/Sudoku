@@ -259,12 +259,16 @@ void printsForRedoUndo(int isUndo, int row, int col, int num1, int num2)
 int generate(int X, int Y, int dim){
 	int tries=0;
 	int step1Success = 0;
+	int cellAssignSuccesss = 0;
 	int randCount = 0;
 	int arri[X];
 	int arrj[X];
 	int arrk[X];
+	int i =0, j=0;
 	//step 1: up to 1,000 tries: choose X cells, fill them randomly with valid values and try to solve using ILP
 	while(!step1Success && tries<1000){
+		randCount = 0;
+		cellAssignSuccesss = 0;
 		while(randCount<X){
 			arri[randCount] = rand() % dim*dim; // [i][j] coordinated are between  0 - (dim-1)
 			arrj[randCount] = rand() % dim*dim;
@@ -273,23 +277,54 @@ int generate(int X, int Y, int dim){
 				board[arri[randCount]][arrj[randCount]]=1;
 			}
 		}//now X cells were randomly chosen
-
 		//next - we'll try to fill them randomly with valid values
+		if(randomFill(X,arri,arrj)){ //try to randomly fill chosen cells with legal values
+			cellAssignSuccesss = 1; // case succeed
+		}
+		else{ // case failed - wipe out the board back
+			for(int i=0; i<dim; i++){
+				for(int j=0;j<dim; j++){
+					board[i][j]=0;
+				}
+			}
+		}
 
-
-
-		tries++;//if no success.. count this as a try.
+		// if we were able to assign all X cells with valid values - we need to make sure the board is solvable with ILP
+		if(cellAssignSuccesss){
+			if(ILPSolver(board,fixed,solvedBoard,blockHeight,blockWidth,dim)){// if there is a solution
+				step1Success = 1;
+			}
+		}
+		else{
+			tries++;
+		}
 	}
-	if(!step1Success){
+	if(!step1Success){ // case while loop stopped after 1,000 unsuccessful iterations
 		printf("Error: puzzle generation failed\n");
 		return 0;
 	}
 	// continue to step 2: erase Y randomly chosen cells and clear their value. Print board,
-
-
-	printBoard();
+	// make board the solvedBoard
+	for(int i=0;i<dim;i++){
+		for(int j=0; j<dim; j++){
+			board[i][j] = solvedBoard[i][j];
+		}
+	}
+	//choose Y random cells to clean
+	randCount = 0;
+	while(randCount<Y){
+		arri[randCount] = rand() % dim*dim; // [i][j] coordinated are between  0 - (dim-1)
+		arrj[randCount] = rand() % dim*dim;
+		if((board[arri[randCount]][arrj[randCount]]==0)){ //cell was not already chosen..
+			randCount++;
+			board[arri[randCount]][arrj[randCount]]=0;
+		}
+	}
+	printBoard(); // print finished puzzle
 	return 1;
 }
+
+
 
 /*
  *doCommand - checks type of command using switch case. Checks validity and prints error message if needed, else - calls corresponding function.
