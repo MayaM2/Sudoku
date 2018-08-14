@@ -261,7 +261,7 @@ int generate(int x, int y, int dim){ //TODO
  *doCommand - checks type of command using switch case. Checks validity and prints error message if needed, else - calls corresponding function.
  */
 void doCommand(Command* inpCommand){
-	int i=0,j=0;
+	int i=0,j=0, sols=0;
 switch(inpCommand->commands){
 
 	case SOLVE_COMMAND:
@@ -350,7 +350,7 @@ switch(inpCommand->commands){
 					}
 					/* in this case, we can set the board! */
 					undoRedoAppend(undoRedo,(inpCommand->arg1)-1,(inpCommand->arg2)-1,
-							board[(inpCommand->arg1)-1][(inpCommand->arg2)-1],inpCommand->arg3,0);
+							board[(inpCommand->arg1)-1][(inpCommand->arg2)-1],inpCommand->arg3,0,0);
 					board[(inpCommand->arg1)-1][(inpCommand->arg2)-1]=inpCommand->arg3;
 					/* board print may be executed by main... */
 					printBoard();
@@ -430,7 +430,7 @@ switch(inpCommand->commands){
 					undoRedo->curr=undoRedo->curr->prev;
 					if(undoRedo->curr->row==-1)
 						break;
-					if(undoRedo->curr->isAutofilled==1 && undoRedo->curr->next->isAutofilled==1)
+					if(undoRedo->curr->isAutofilled==1 && undoRedo->curr->next->isAutofilled==1 && undoRedo->curr->next->isAutofillStarter==0)
 						i--;
 				}
 			}
@@ -453,7 +453,7 @@ switch(inpCommand->commands){
 							undoRedo->curr->oldVal,
 							undoRedo->curr->newVal);
 					board[undoRedo->curr->row][undoRedo->curr->col]=undoRedo->curr->newVal;
-					if(undoRedo->curr->next!=NULL && undoRedo->curr->isAutofilled==1 && undoRedo->curr->next->isAutofilled==1)
+					if(undoRedo->curr->next!=NULL && undoRedo->curr->isAutofilled==1 && undoRedo->curr->next->isAutofilled==1 && undoRedo->curr->next->isAutofillStarter==0)
 						i--;
 					if(undoRedo->curr->next==NULL)
 						break;
@@ -500,7 +500,23 @@ switch(inpCommand->commands){
 		break;
 
 	case NUMSOLUTIONS_COMMAND:
-		/* will use ROI's exhustive backtracking */
+		if(gameMode==INIT)
+			printf("ERROR: invalid command\n");
+		else
+		{
+			if(isBoardErroneous()==1)
+				printf("Error: board contains erroneous values\n");
+			else
+			{
+				sols=numSols(board,blockHeight,blockWidth);
+				printf("Number of solutions: %d\n",sols);
+				if(sols==1)
+					printf("This is a good board!\n");
+				else
+					printf("The puzzle has more than 1 solution, try to edit it further\n");
+			}
+
+		}
 		break;
 
 	case AUTOFILL_COMMAND:
