@@ -23,11 +23,11 @@ extern int gameMode;
 extern int markErrors;
 
 /*
- * "Hidden" func- check neighbors. if only one val is possible, return it, else 0;
+ * "Hidden" func- updates binary neighbors array.
  */
-int isObv(int** board, int row, int col,int blockHeight, int blockWidth, int* neighborsBin){
+void updateNeighbors(int** board, int row, int col,int blockHeight, int blockWidth, int* neighborsBin)
+{
 	int i=0, j=0, val=0,dim=blockHeight*blockWidth;
-	int count=dim;
 
 	for(i=0;i<dim;i++)
 		neighborsBin[i]=0;
@@ -38,10 +38,8 @@ int isObv(int** board, int row, int col,int blockHeight, int blockWidth, int* ne
 		val=board[row][i];
 		if(val==0)
 			continue;
-		if(neighborsBin[val-1]==0){
+		if(neighborsBin[val-1]==0)
 			neighborsBin[val-1]=1;
-			count--;
-		}
 	}
 
 	/* go over col */
@@ -50,10 +48,8 @@ int isObv(int** board, int row, int col,int blockHeight, int blockWidth, int* ne
 		val=board[i][col];
 		if(val==0)
 			continue;
-		if(neighborsBin[val-1]==0){
+		if(neighborsBin[val-1]==0)
 			neighborsBin[val-1]=1;
-			count--;
-		}
 	}
 
 	/*go over block*/
@@ -64,13 +60,22 @@ int isObv(int** board, int row, int col,int blockHeight, int blockWidth, int* ne
 			val=board[i][j];
 			if(val==0)
 				continue;
-			if(neighborsBin[val-1]==0){
+			if(neighborsBin[val-1]==0)
 				neighborsBin[val-1]=1;
-				count--;
-			}
 		}
 	}
+}
 
+/*
+ * "Hidden" func- check neighbors. if only one val is possible, return it, else 0;
+ */
+int isObv(int** board, int row, int col,int blockHeight, int blockWidth, int* neighborsBin)
+{
+	int i=0, dim=blockWidth*blockHeight,count=dim;
+	updateNeighbors(board, row, col,blockHeight, blockWidth, neighborsBin);
+	for(i=0;i<dim;i++)
+		if(neighborsBin[i]==1)
+			count--;
 	if(count==1)
 	{
 		for(i=0;i<dim;i++)
@@ -92,16 +97,19 @@ void Autofill(int** board, UndoRedoList *urli, int blockHeight, int blockWidth)
 			{
 				val=isObv(board,i,j,blockHeight,blockWidth,neighborsBin);
 				if(val!=0){
-					undoRedoAppend(urli,i,j,0,val,1);
-					if(appended==0)
+					if(appended==0){
 						appended=1;
+						undoRedoAppend(urli,i,j,0,val,1,1);
+					}
+					else
+						undoRedoAppend(urli,i,j,0,val,1,0);
 				}
 			}
 		}
 	}
 	if(appended==1)
 	{
-		while(urli->curr->prev->isAutofilled==1)
+		while(urli->curr->prev->isAutofilled==1 && urli->curr->isAutofillStarter==0)
 			urli->curr=urli->curr->prev;
 		while(urli->curr!=NULL)
 		{
@@ -112,6 +120,164 @@ void Autofill(int** board, UndoRedoList *urli, int blockHeight, int blockWidth)
 		urli->curr=urli->tail;
 	}
 }
+
+/*
+ * "Hidden" func- return next cell in board, according to direction. -1 -1 denotes trying to leave last cell,
+ * -2 -2 denotes trying to go before first cell.
+ */
+void nextCell(int row, int col, int isForward,int dim, int* indexes){
+
+	/* forward */
+	if(isForward==1){
+		if(row==dim-1 && col==dim-1){
+			indexes[0]=-1;
+			indexes[1]=-1;
+		}
+		else{
+			if(col==dim-1){
+				indexes[0]=row+1;
+				indexes[1]=0;
+			}
+			else{
+				indexes[0]=row;
+				indexes[1]=col+1;
+			}
+		}
+	}
+	/* backwards*/
+	else{
+		if(row==0 && col==0){
+			indexes[0]=-2;
+			indexes[1]=-2;
+		}
+		else{
+			if(col==0){
+				indexes[0]=row-1;
+				indexes[1]=dim-1;
+			}
+			else{
+				indexes[0]=row;
+				indexes[1]=col-1;
+			}
+		}
+	}
+}
+
+void demoPrint(int sols, int dim, int** board)
+{
+	int j=0,k=0;
+	printf("sol #%d:\n",sols);
+	for(j=0;j<dim;j++)
+	{
+		for(k=0;k<dim;k++)
+		{
+			printf("%2d ",board[j][k]);
+		}
+		printf("\n");
+	}
+}
+
+int numSols(int** board, int blockHeight, int blockWidth)
+{
+	int sols=0, i=0, currInd=0, indexes[2]={0,0},row=0,col=0, isForward=1, dim=blockHeight*blockWidth;
+	int* bin;
+	RecStack *rec = recStackCreator();
+	RecStackNode *n;
+	bin=(int*)calloc(dim,sizeof(int));
+	do
+	{
+		/*
+		 * Forward- find next empty cell. if -1 -1 (meaning, board is FULL), increment sols count, and
+		 * prepare for reverse backtracking. else, update neighbors, change cell value into first possible
+		 * value, and push into stack.
+		 */
+		if(isForward==1)
+		{
+			while(col!=-1 && board[row][col]!=0)
+			{
+				nextCell(row,col,isForward,dim,indexes);
+				row=indexes[0];
+				col=indexes[1];
+			}
+			if(row==-1 && col==-1)
+			{
+				isForward=0;
+				sols++;
+			}
+			else
+			{
+				updateNeighbors(board,row,col,blockHeight,blockWidth,bin);
+				for(i=0;i<dim;i++)
+					if(bin[i]==0)
+						break;
+				if(i<dim)
+				{
+					board[row][col]=i+1;
+					recStackPushInfo(rec,row,col,isForward,bin,dim);
+				}
+				else
+					isForward=0;
+
+			}
+
+		}
+		/*
+		 * Backwards- check recStack head for new possible vals. if none exist, remove head, and change val
+		 * in board to 0 ( ie- continue backwards). else, place new possible val, and go forwards.
+		 */
+		else
+		{
+			n=rec->head;
+			row=n->row;
+			col=n->col;
+			currInd=board[n->row][n->col]-1;
+			n->neighborsBin[currInd]=1;
+			i=currInd+1;
+			for(;i<dim;i++)
+				if(n->neighborsBin[i]==0)
+					break;
+			if(i==dim)
+			{
+				board[n->row][n->col]=0;
+				destroyStackNode(recStackPop(rec));
+			}
+			else
+			{
+				board[n->row][n->col]=i+1;
+				row=n->row;
+				col=n->col;
+				isForward=1;
+			}
+		}
+		/*if(currInd>=dim)
+		{
+			printf("WEEOOWEEEOO!!! %d %d %d %d\n", n->row,n->col,currInd,isForward);
+			break;
+		}
+		printf("set [%d,%d] with %d, going %s\n",row,col,row==-1?0:board[row][col],isForward==1?"Forwards":"Backwards");
+		if(board[row][col]>12)
+			break;
+
+		printf("head=");
+		if(rec->head==NULL)
+			printf("NULL\n");
+		else
+			printf("%d %d\n",rec->head->row,rec->head->col);
+		if(row==-1 && isForward==0 && rec->head->row==11 && rec->head->col==6)
+			count++;
+		if(count>1)
+			break;
+		*/
+	}
+	while(rec->head!=NULL);
+	if(n!=NULL)
+		destroyStackNode(n);
+	recStackDestroyer(rec);
+
+	return sols;
+}
+
+
 
 /*
  * Will use Gurobi Optimizer to try and solve current board, and under the constrains
@@ -359,5 +525,3 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 	GRBfreeenv(env); // free environment memory
 	return 0;
 }
-
-
