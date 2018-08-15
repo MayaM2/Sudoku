@@ -13,14 +13,6 @@
 
 // Gurobi variables and declarations :
 #include "gurobi_c.h"
-extern int **board;
-extern int**fixed;
-extern int**solvedBoard;
-extern int blockHeight;
-extern int blockWidth;
-extern int dim;
-extern int gameMode;
-extern int markErrors;
 
 /*
  * "Hidden" func- updates binary neighbors array.
@@ -300,7 +292,6 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 	char vtype[dim*dim*dim];
 	int optimstatus;
 	double objval;
-	int zero=0;
 	int i=0, j=0, k=0, ii=0,jj=0,count=0;
 
 	//Create environment
@@ -526,3 +517,4 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 	GRBfreeenv(env); // free environment memory
 	return 0;
 }
+
