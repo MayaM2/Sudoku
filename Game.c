@@ -146,8 +146,8 @@ int validate(int** board,int blockHeight, int blockWidth, int dim, int printMess
  */
 int allfilled(int** board, int dim){
 	int i=0,j=0;
-	for (int i = 0; i < dim; i++){
-	  for (int j = 0; j < dim; j++){
+	for (; i < dim; i++){
+	  for (; j < dim; j++){
 		  if(board[i][j] ==0)
 			  return 0;
 	  }
@@ -260,7 +260,7 @@ int problemCellAssignment(int i, int j){
 	int x=0,count=0,ind=0;
 	int OpArr[dim];
 	// Initialize OpArr with zeroes
-	for(int x=0; x<dim;x++){
+	for(; x<dim;x++){
 		OpArr[x]=1;
 	}
 
@@ -328,7 +328,7 @@ int generate(int X, int Y, int dim){
 	int arri[X];
 	int arrj[X];
 	int arrk[X];
-	int i =0, j=0;
+	int i=0,j=0;
 	//step 1: up to 1,000 tries: choose X cells, fill them randomly with valid values and try to solve using ILP
 	while(!step1Success && tries<1000){
 		randCount = 0;
@@ -346,8 +346,8 @@ int generate(int X, int Y, int dim){
 			cellAssignSuccesss = 1; // case succeed
 		}
 		else{ // case failed - wipe out the board back
-			for(int i=0; i<dim; i++){
-				for(int j=0;j<dim; j++){
+			for(i=0; i<dim; i++){
+				for(j=0;j<dim; j++){
 					board[i][j]=0;
 				}
 			}
@@ -369,8 +369,8 @@ int generate(int X, int Y, int dim){
 	}
 	// continue to step 2: erase Y randomly chosen cells and clear their value. Print board,
 	// make board the solvedBoard
-	for(int i=0;i<dim;i++){
-		for(int j=0; j<dim; j++){
+	for(i=0;i<dim;i++){
+		for(j=0; j<dim; j++){
 			board[i][j] = solvedBoard[i][j];
 		}
 	}
