@@ -1,6 +1,11 @@
 #ifndef STRUCTS_H_
 #define STRUCTS_H_
 
+
+void destroyNode(UndoRedoNode* n);
+void LFLNodeDelete(LoadFileNode *n);
+
+
 /*
  * Command
  */
