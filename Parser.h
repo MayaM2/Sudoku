@@ -8,8 +8,7 @@
 #ifndef PARSER_H_
 #define PARSER_H_
 
-int IsInteger(const char* s);
-
 void ParseCommand(Command *currCommand);
+int IsInteger(const char* s);
 
 #endif /* PARSER_H_ */

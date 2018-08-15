@@ -2,10 +2,6 @@
 #define STRUCTS_H_
 
 
-void destroyNode(UndoRedoNode* n);
-void LFLNodeDelete(LoadFileNode *n);
-
-
 /*
  * Command
  */
@@ -122,6 +118,11 @@ RecStackNode* recStackNodeCreator(int row, int col, int isForward, int* bin, int
  * return and update head of stack
  */
 RecStackNode* recStackPop(RecStack* r);
+
+
+void destroyNode(UndoRedoNode* n);
+void LFLNodeDelete(LoadFileNode *n);
+
 
 #endif /* STRUCTS_H_ */
 
