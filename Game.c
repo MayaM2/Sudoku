@@ -119,7 +119,7 @@ int validate(int** board,int blockHeight, int blockWidth, int dim, int printMess
 			printf("Error: board contains erroneous values\n");
 			return 0;
 		}
-		passed = ILPSolver(ILPSolver(board,fixed,solvedBoard,blockHeight,blockWidth,dim));
+		passed = ILPSolver(board,fixed,solvedBoard,blockHeight,blockWidth,dim);
 		if(passed){
 			if(printMessage){
 				printf("Validation passed: board is solvable\n");
