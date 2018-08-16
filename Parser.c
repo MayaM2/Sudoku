@@ -21,7 +21,7 @@ int IsInteger(const char* s)
 	int i=0;
 	for(i = 0; i <strlen(s); i ++)
 	{
-		//ASCII value of 0 = 48, 9 = 57.
+		/*ASCII value of 0 = 48, 9 = 57*/
 		if (s[i] < 48 || s[i] > 57)
          return 0;
    }
