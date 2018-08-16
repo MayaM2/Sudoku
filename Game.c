@@ -103,7 +103,7 @@ void printBoard()
  * 0 therwise.
  */
 int numInRange(int num, int lower, int upper){
-	if ((unsigned)(num-lower) <= (upper-lower)){
+	if (num<=lower && num>=upper){
 		return 1;
 	}
 	return 0;
