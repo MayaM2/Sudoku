@@ -327,7 +327,6 @@ int generate(int X, int Y, int dim){
 	int randCount = 0;
 	int arri[X];
 	int arrj[X];
-	int arrk[X];
 	int i=0,j=0;
 	/*step 1: up to 1,000 tries: choose X cells, fill them randomly with valid values and try to solve using ILP*/
 	while(!step1Success && tries<1000){
