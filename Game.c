@@ -258,7 +258,7 @@ void printsForRedoUndo(int isUndo, int row, int col, int num1, int num2)
 int problemCellAssignment(int i, int j){
 	int numOptions = dim;
 	int x=0,count=0,ind=0;
-	int OpArr[dim];
+	int* OpArr = (int*)calloc(dim,sizeof(int));
 	/* Initialize OpArr with zeroes*/
 	for(; x<dim;x++){
 		OpArr[x]=1;
@@ -278,12 +278,14 @@ int problemCellAssignment(int i, int j){
 		/* try and put value in cell*/
 		board[i][j]=ind;
 		if(!isBoardErroneous()){
+			free(OpArr);
 			return 1; /* successful*/
 		}
 		/* case not successful*/
 		OpArr[ind-1]=0; /* delete option*/
 		numOptions--;
 	}
+	free(OpArr);
 	return 0; /* we went through all options for values, and they were all unsuccessful*/
 }
 
