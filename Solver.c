@@ -11,7 +11,7 @@
 #include "Enums.h"
 #include "Structs.h"
 
-// Gurobi variables and declarations :
+/* Gurobi variables and declarations :*/
 #include "gurobi_c.h"
 
 /*
@@ -280,9 +280,9 @@ int numSols(int** board, int blockHeight, int blockWidth)
 
 int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockWidth, int dim){
 
-	GRBenv *env = NULL; //initialize environment
-	GRBmodel *model = NULL; //initialize model
-	// initialize program variables
+	GRBenv *env = NULL; /*initialize environment*/
+	GRBmodel *model = NULL; /*initialize model*/
+	/* initialize program variables*/
 	int error = 0;
 	double sol[dim*dim*dim];
 	int intSol[dim*dim*dim];
@@ -294,26 +294,26 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 	double objval;
 	int i=0, j=0, k=0, ii=0,jj=0,count=0;
 
-	//Create environment
+	/*Create environment*/
 	error = GRBloadenv(&env,""); //TODO - find out about logfiles in gurobi.
-	//here no log file will be written since an empty string was given.
+	/*here no log file will be written since an empty string was given.*/
 	if (error || env == NULL){
 		printf("Error %d : in GRBloadenv: %s\n", error, GRBgeterrormsg(env));
-		GRBfreemodel(model); // free model memory
-		GRBfreeenv(env); // free environment memory
+		GRBfreemodel(model); /* free model memory*/
+		GRBfreeenv(env); /* free environment memory*/
 		return 0;
 	}
 
-	//Create empty model
+	/*Create empty model*/
 	error = GRBnewmodel(env,&model,"ILPSolve",0,NULL,NULL,NULL,NULL,NULL);
 	if (error || env == NULL){
 		printf("Error %d : in GRBnewmodel: %s\n", error, GRBgeterrormsg(env));
-		GRBfreemodel(model); // free model memory
-		GRBfreeenv(env); // free environment memory
+		GRBfreemodel(model); /* free model memory*/
+		GRBfreeenv(env); /* free environment memory*/
 		return 0;
 	}
 
-	//Add variables
+	/*Add variables*/
 	for(i=0; i<dim*dim*dim;i++){
 		obj[i]=1;
 		vtype[i]=GRB_BINARY;
@@ -321,87 +321,87 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 	error = GRBaddvars(model,dim*dim*dim,0,NULL,NULL,NULL,obj,NULL,NULL,vtype,NULL);
 	if(error){
 		printf("Error %d : in GRBaddvars: %s\n", error, GRBgeterrormsg(env));
-		GRBfreemodel(model); // free model memory
-		GRBfreeenv(env); // free environment memory
+		GRBfreemodel(model); /* free model memory*/
+		GRBfreeenv(env); /* free environment memory*/
 		return 0;
 	}
 
-	//change objective sense to maximization - default is min
+	/*change objective sense to maximization - default is min*/
 	error = GRBsetintattr(model, GRB_INT_ATTR_MODELSENSE, GRB_MAXIMIZE);
 	if(error){
 		printf("Error %d : in GRBsetintattr: %s\n", error, GRBgeterrormsg(env));
-		GRBfreemodel(model); // free model memory
-		GRBfreeenv(env); // free environment memory
+		GRBfreemodel(model); /* free model memory*/
+		GRBfreeenv(env); /* free environment memory*/
 		return 0;
 	}
 
 
-	//Update model - to integrate new variables
+	/*Update model - to integrate new variables*/
 	error = GRBupdatemodel(model);
 	if(error){
 		printf("Error %d : in GRBupdatemodel: %s\n", error, GRBgeterrormsg(env));
-		GRBfreemodel(model); // free model memory
-		GRBfreeenv(env); // free environment memory
+		GRBfreemodel(model); /* free model memory*/
+		GRBfreeenv(env); /* free environment memory*/
 		return 0;
 	}
 
-	//Add constrains: there are five kinds: cells, rows, cols, block, fixed
+	/*Add constrains: there are five kinds: cells, rows, cols, block, fixed*/
 
-	//Add cell constraints - for each [i,j] cell, only allow to hold one value
+	/*Add cell constraints - for each [i,j] cell, only allow to hold one value*/
 	for(i=0;i<dim;i++){
 		for(j=0;j<dim;j++){
-			for(k=0;k<dim;k++){ //sum variable values over all possible k's for specific [i,j]
+			for(k=0;k<dim;k++){ /*sum variable values over all possible k's for specific [i,j]*/
 				ind[k]=i*dim*dim+j*dim+k;
 				val[k]=1.0;
 			}
 			error= GRBaddconstr(model,dim,ind,val,GRB_EQUAL,1.0,NULL);
 			if(error){
 				printf("Error %d : in GRBaddconstr: %s\n", error, GRBgeterrormsg(env));
-				GRBfreemodel(model); // free model memory
-				GRBfreeenv(env); // free environment memory
+				GRBfreemodel(model); /* free model memory*/
+				GRBfreeenv(env); /* free environment memory*/
 				return 0;
-			} //end of if error
-		}// end of specific  [i,j] cell
-	}// go through all possible [i,j]
+			} /*end of if error*/
+		}/* end of specific  [i,j] cell*/
+	}/* go through all possible [i,j]*/
 
 
-	//Add row constraints - for each i index
+	/*Add row constraints - for each i index*/
 	for(k=0;k<dim;k++){
 		for(j=0;j<dim;j++){
-			for(i=0;i<dim;i++){ //sum variable values over all the row
+			for(i=0;i<dim;i++){ /*sum variable values over all the row*/
 				ind[i]=i*dim*dim+j*dim+k;
 				val[i]=1.0;
 			}
 			error= GRBaddconstr(model,dim,ind,val,GRB_EQUAL,1.0,NULL);
 			if(error){
 				printf("Error %d : in GRBaddconstr: %s\n", error, GRBgeterrormsg(env));
-				GRBfreemodel(model); // free model memory
-				GRBfreeenv(env); // free environment memory
+				GRBfreemodel(model); /* free model memory*/
+				GRBfreeenv(env); /* free environment memory*/
 				return 0;
-			} //end of if error
-		}// end of specific  [i,j] cell
-	}// go through all possible [i,j]
+			} /*end of if error*/
+		}/* end of specific  [i,j] cell*/
+	}/* go through all possible [i,j]*/
 
 
-	//Add col constraints - for each j index
+	/*Add col constraints - for each j index*/
 	for(i=0;i<dim;i++){
 		for(k=0;k<dim;k++){
-			for(j=0;j<dim;j++){ //sum variable values over all the col
+			for(j=0;j<dim;j++){ /*sum variable values over all the col*/
 				ind[j]=i*dim*dim+j*dim+k;
 				val[j]=1.0;
 			}
 			error= GRBaddconstr(model,dim,ind,val,GRB_EQUAL,1.0,NULL);
 			if(error){
 				printf("Error %d : in GRBaddconstr: %s\n", error, GRBgeterrormsg(env));
-				GRBfreemodel(model); // free model memory
-				GRBfreeenv(env); // free environment memory
+				GRBfreemodel(model); /* free model memory*/
+				GRBfreeenv(env); /* free environment memory*/
 				return 0;
-			} //end of if error
-		}// end of specific  [i,j] cell
-	}// go through all possible [i,j]
+			} /*end of if error*/
+		}/* end of specific  [i,j] cell*/
+	}/* go through all possible [i,j]*/
 
 
-	//Add block constraints
+	/*Add block constraints*/
 	for(k=0;k<dim;k++){
 		for(ii=0;ii<blockHeight;ii++){
 			for(jj=0;jj<blockWidth;jj++){
@@ -416,10 +416,10 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 				error = GRBaddconstr(model,dim,ind,val,GRB_EQUAL,1.0,NULL);
 				if(error){
 					printf("Error %d : in GRBaddconstr: %s\n", error, GRBgeterrormsg(env));
-					GRBfreemodel(model); // free model memory
-					GRBfreeenv(env); // free environment memory
+					GRBfreemodel(model); /* free model memory*/
+					GRBfreeenv(env); /* free environment memory*/
 					return 0;
-				} //end of if error
+				} /*end of if error*/
 
 			}
 
@@ -427,94 +427,93 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 	}
 
 
-	//Add fixed-cell constraints
+	/*Add fixed-cell constraints*/
 	for(i=0;i<dim;i++){
 		for(j=0;j<dim;j++){
-			if(fixed[i][j]==1){ // if certain cell is set to be fixed
+			if(fixed[i][j]==1){ /* if certain cell is set to be fixed*/
 				k=board[i][j];
 				ind[0]=i*dim*dim+j*dim+k;
-				val[0]=1; //coeff of constraint is 1
-				error = GRBaddconstr(model,1,ind,val,GRB_EQUAL,1.0,NULL); //add constraint: 1*X=1
-				// for the certain X that's in the i*dim*dim+j*dim+k place in variables array.
+				val[0]=1; /*coeff of constraint is 1*/
+				error = GRBaddconstr(model,1,ind,val,GRB_EQUAL,1.0,NULL); /*add constraint: 1*X=1
+				 for the certain X that's in the i*dim*dim+j*dim+k place in variables array.*/
 				if(error){
 					printf("Error %d : in GRBaddconstr: %s\n", error, GRBgeterrormsg(env));
-					GRBfreemodel(model); // free model memory
-					GRBfreeenv(env); // free environment memory
+					GRBfreemodel(model); /* free model memory*/
+					GRBfreeenv(env); /* free environment memory*/
 					return 0;
-				} //end of if error
+				} /*end of if error*/
 			}
 		}
 	}
 
-	//Optimize model
+	/*Optimize model*/
 	error = GRBoptimize(model);
 	if(error){
 		printf("Error %d : in GRBoptimize: %s\n", error, GRBgeterrormsg(env));
-		GRBfreemodel(model); // free model memory
-		GRBfreeenv(env); // free environment memory
+		GRBfreemodel(model); /* free model memory*/
+		GRBfreeenv(env); /* free environment memory*/
 		return 0;
 	}
 
-	//Capture solution information
-	error = GRBgetintattr(model, GRB_INT_ATTR_STATUS,&optimstatus); //query the status of the optimization process
-	// by retrieving the values of the status attribute.
+	/*Capture solution information*/
+	error = GRBgetintattr(model, GRB_INT_ATTR_STATUS,&optimstatus); /*query the status of the optimization process
+	 by retrieving the values of the status attribute.*/
 	if(error){
 		printf("Error %d : in GRBgetintattr: %s\n", error, GRBgeterrormsg(env));
-		GRBfreemodel(model); // free model memory
-		GRBfreeenv(env); // free environment memory
+		GRBfreemodel(model); /* free model memory*/
+		GRBfreeenv(env); /* free environment memory*/
 		return 0;
 	}
 
 	error = GRBgetdblattr(model, GRB_DBL_ATTR_OBJVAL, &objval);
 	if(error){
 		printf("Error %d : in GRBgetdblattr: %s\n", error, GRBgeterrormsg(env));
-		GRBfreemodel(model); // free model memory
-		GRBfreeenv(env); // free environment memory
+		GRBfreemodel(model); /*free model memory*/
+		GRBfreeenv(env); /* free environment memory*/
 		return 0;
 	}
 
 	error = GRBgetdblattarray(model,GRB_DBL_ATTR_X,0,dim*dim*dim,sol);
 	if(error){
 		printf("Error %d : in GRBgetdblattarray: %s\n", error, GRBgeterrormsg(env));
-		GRBfreemodel(model); // free model memory
-		GRBfreeenv(env); // free environment memory
+		GRBfreemodel(model); /* free model memory*/
+		GRBfreeenv(env); /* free environment memory*/
 		return 0;
 	}
 
-	//case an optimum was found
+	/*case an optimum was found*/
 	if(optimstatus == GRB_OPTIMAL){
-		//update intSol to int values of double sol array
+		/*update intSol to int values of double sol array*/
 		for(i=0;i<dim*dim*dim;i++){
 					intSol[i]= floor(sol[i]);
 		}
 
-		//update solvedBoard according to sol array
-		for (i=0; i<dim; i++){ //cols
-			for(j=0;j<dim; j++){ //rows
-				for(k=0; k<dim;k++){ //values from 0 to dim-1
+		/*update solvedBoard according to sol array*/
+		for (i=0; i<dim; i++){ /*cols*/
+			for(j=0;j<dim; j++){ /*rows*/
+				for(k=0; k<dim;k++){ /*values from 0 to dim-1*/
 					if(intSol[i*dim*dim+j*dim+k]==1){
-						solvedBoard[i][j]=(k+1); //sets the value to the cell
+						solvedBoard[i][j]=(k+1); /*sets the value to the cell*/
 					}
 				}
 			}
 		}
-		GRBfreemodel(model); // free model memory
-		GRBfreeenv(env); // free environment memory
+		GRBfreemodel(model); /* free model memory*/
+		GRBfreeenv(env); /* free environment memory*/
 		return 1;
 	}
 
 	// case of infinite or unbounded solution
 	if(optimstatus == GRB_INF_OR_UNBD){
 		printf("Unsolvable\n");
-		GRBfreemodel(model); // free model memory
-		GRBfreeenv(env); // free environment memory
+		GRBfreemodel(model); /* free model memory*/
+		GRBfreeenv(env); /* free environment memory*/
 		return -1;
 	}
 
-	//case there was a runtime problem
-	//Free model
-	GRBfreemodel(model); // free model memory
-	GRBfreeenv(env); // free environment memory
+	/*case there was a runtime problem- Free model*/
+	GRBfreemodel(model); /* free model memory*/
+	GRBfreeenv(env); /* free environment memory*/
 	return 0;
 }
 
