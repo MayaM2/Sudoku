@@ -321,13 +321,12 @@ int randomFill(int X,int *arri,int *arrj){
  * return 1 if succeeded, 0 otherwise.
  */
 int generate(int X, int Y, int dim){
-	int tries=0;
+	int tries=0,i=0,j=0;
 	int step1Success = 0;
 	int cellAssignSuccesss = 0;
 	int randCount = 0;
-	int arri[X];
-	int arrj[X];
-	int i=0,j=0;
+	int* arri = (int*)calloc(X,sizeof(int));
+	int* arrj = (int*)calloc(X,sizeof(int));
 	/*step 1: up to 1,000 tries: choose X cells, fill them randomly with valid values and try to solve using ILP*/
 	while(!step1Success && tries<1000){
 		randCount = 0;
@@ -364,6 +363,8 @@ int generate(int X, int Y, int dim){
 	}
 	if(!step1Success){ /* case while loop stopped after 1,000 unsuccessful iterations*/
 		printf("Error: puzzle generation failed\n");
+		free(arri);
+		free(arrj);
 		return 0;
 	}
 	/* continue to step 2: erase Y randomly chosen cells and clear their value. Print board,
@@ -384,6 +385,8 @@ int generate(int X, int Y, int dim){
 		}
 	}
 	printBoard(); /* print finished puzzle*/
+	free(arri);
+	free(arrj);
 	return 1;
 }
 
