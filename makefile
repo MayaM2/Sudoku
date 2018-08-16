@@ -6,13 +6,12 @@ GUROBI_COMP = -I/usr/local/lib/gurobi563/include
 GUROBI_LIB = -L/usr/local/lib/gurobi563/lib -lgurobi56
 
 $(EXEC): $(OBJS)
-	$(CC) $(OBJS) -o $@
-	$(CC) Solver.o $(GUROBI_LIB) -o $@ -lm
+	$(CC) $(OBJS) $(GUROBI_LIB) -o $@ -lm
 main.o: main.c Game.h Enums.h Parser.h Structs.h
 	$(CC) $(COMP_FLAG) -c $*.c
 Game.o: Game.c  Solver.h Enums.h Structs.h IOmod.h
 	$(CC) $(COMP_FLAG) -c $*.c
-Solver.o: Solver.c Enums.h Structs.h 
+Solver.o: Solver.c Enums.h Structs.h
 	$(CC) $(COMP_FLAGS) $(GUROBI_COMP) -c $*.c
 Parser.o: Parser.c Enums.h Structs.h
 	$(CC) $(COMP_FLAG) -c $*.c
