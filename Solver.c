@@ -503,7 +503,7 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 		return 1;
 	}
 
-	// case of infinite or unbounded solution
+	/*case of infinite or unbounded solution*/
 	if(optimstatus == GRB_INF_OR_UNBD){
 		printf("Unsolvable\n");
 		GRBfreemodel(model); /* free model memory*/
