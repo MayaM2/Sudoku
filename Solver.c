@@ -288,7 +288,7 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 	int intSol[dim*dim*dim];
 	int ind[dim];
 	int val[dim];
-	int obj[dim*dim*dim]; //coeffs of obj. function
+	double obj[dim*dim*dim]; //coeffs of obj. function
 	char vtype[dim*dim*dim];
 	int optimstatus;
 	double objval;
@@ -315,7 +315,7 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 
 	/*Add variables*/
 	for(i=0; i<dim*dim*dim;i++){
-		obj[i]=1;
+		obj[i]=1.0;
 		vtype[i]=GRB_BINARY;
 	}
 	error = GRBaddvars(model,dim*dim*dim,0,NULL,NULL,NULL,obj,NULL,NULL,vtype,NULL);
