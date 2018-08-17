@@ -480,7 +480,7 @@ switch(inpCommand->commands){
 	case SET_COMMAND: /*ALMOST DONE*/
 		if(gameMode == EDIT ||gameMode == SOLVE){
 			if(inpCommand->validity==1){ /* checks if any integers were given as X Y Z */
-				if(numInRange(inpCommand->arg1,1,dim)&&numInRange(inpCommand->arg2,1,dim)){ /* checks if X Y Z are in range 1-N, N=dim */
+				if(numInRange(inpCommand->arg1,1,dim)&&numInRange(inpCommand->arg2,1,dim)&&numInRange(inpCommand->arg3,1,dim)){ /* checks if X Y Z are in range 1-N, N=dim */
 					if(fixed[inpCommand->arg1-1][inpCommand->arg2-1]==1){
 						printf("Error: cell is fixed\n");
 						break;
