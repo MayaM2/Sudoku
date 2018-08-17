@@ -294,7 +294,7 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 	int i=0, j=0, k=0, ii=0,jj=0,count=0;
 
 	/*Create environment*/
-	error = GRBloadenv(&env,""); //TODO - find out about logfiles in gurobi.
+	error = GRBloadenv(&env,"");
 	/*here no log file will be written since an empty string was given.*/
 	if (error || env == NULL){
 		printf("Error %d : in GRBloadenv: %s\n", error, GRBgeterrormsg(env));
