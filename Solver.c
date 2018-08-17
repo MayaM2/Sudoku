@@ -331,13 +331,6 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 	}
 
 
-	/*Update model - to integrate new variables*/
-	error = GRBupdatemodel(model);
-	if(error){
-		printf("Error %d : in GRBupdatemodel: %s\n", error, GRBgeterrormsg(env));
-		goto QUIT;
-	}
-
 	/*Add constrains: there are five kinds: cells, rows, cols, block, fixed*/
 
 	/*Add cell constraints - for each [i,j] cell, only allow to hold one value*/
