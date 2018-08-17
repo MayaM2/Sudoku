@@ -465,13 +465,6 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 		return 0;
 	}
 
-	error = GRBgetdblattr(model, GRB_DBL_ATTR_OBJVAL, &objval);
-	if(error){
-		printf("Error %d : in GRBgetdblattr: %s\n", error, GRBgeterrormsg(env));
-		GRBfreemodel(model); /*free model memory*/
-		GRBfreeenv(env); /* free environment memory*/
-		return 0;
-	}
 
 	error = GRBgetdblattrarray(model,GRB_DBL_ATTR_X,0,dim*dim*dim,sol);
 	if(error){
