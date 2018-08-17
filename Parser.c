@@ -36,6 +36,12 @@ void ParseCommand(Command *currCommand){
 	char readFromUser[256];
 	char* userInp[4];
 
+	userInp[0]=NULL;
+	userInp[1]=NULL;
+	userInp[2]=NULL;
+	userInp[3]=NULL;
+
+
 	/*Don't want to catch game prints...*/
 	setvbuf(stdin,NULL,_IONBF,0);
 
