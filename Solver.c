@@ -284,12 +284,12 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 	GRBmodel *model = NULL; /*initialize model*/
 	/* initialize program variables*/
 	int error = 0;
-	double sol[dim*dim*dim];
-	int intSol[dim*dim*dim];
-	int ind[dim*dim];
-	double val[dim*dim];
-	double obj[dim*dim*dim]; /*coeffs of obj. function*/
-	char vtype[dim*dim*dim];
+	double *sol = (double*)calloc(dim*dim*dim,sizeof(double*));
+	int *intSol = (int*)calloc(dim*dim*dim,sizeof(int*));
+	int *ind = (int*)calloc(dim*dim,sizeof(int*));
+	double *val = (double*)calloc(dim*dim,sizeof(double*));
+	double *obj = (double*)calloc(dim*dim*dim,sizeof(double*)); /*coeffs of obj. function*/
+	double *vtype = (double*)calloc(dim*dim*dim,sizeof(double*));
 	int optimstatus;
 	int i=0, j=0, k=0, ii=0,jj=0,count=0;
 
@@ -298,6 +298,12 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 	/*here no log file will be written since an empty string was given.*/
 	if (error || env == NULL){
 		printf("Error %d : in GRBloadenv: %s\n", error, GRBgeterrormsg(env));
+		free(sol);
+		free(intSol);
+		free(ind);
+		free(val);
+		free(obj);
+		free(vtype);
 		GRBfreemodel(model); /* free model memory*/
 		GRBfreeenv(env); /* free environment memory*/
 		return 0;
@@ -307,6 +313,12 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 	error = GRBnewmodel(env,&model,"ILPSolve",0,NULL,NULL,NULL,NULL,NULL);
 	if (error || env == NULL){
 		printf("Error %d : in GRBnewmodel: %s\n", error, GRBgeterrormsg(env));
+		free(sol);
+		free(intSol);
+		free(ind);
+		free(val);
+		free(obj);
+		free(vtype);
 		GRBfreemodel(model); /* free model memory*/
 		GRBfreeenv(env); /* free environment memory*/
 		return 0;
@@ -323,6 +335,12 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 	error = GRBaddvars(model,dim*dim*dim,0,NULL,NULL,NULL,obj,NULL,NULL,vtype,NULL);
 	if(error){
 		printf("Error %d : in GRBaddvars: %s\n", error, GRBgeterrormsg(env));
+		free(sol);
+		free(intSol);
+		free(ind);
+		free(val);
+		free(obj);
+		free(vtype);
 		GRBfreemodel(model); /* free model memory*/
 		GRBfreeenv(env); /* free environment memory*/
 		return 0;
@@ -332,6 +350,12 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 	error = GRBsetintattr(model, GRB_INT_ATTR_MODELSENSE, GRB_MAXIMIZE);
 	if(error){
 		printf("Error %d : in GRBsetintattr: %s\n", error, GRBgeterrormsg(env));
+		free(sol);
+		free(intSol);
+		free(ind);
+		free(val);
+		free(obj);
+		free(vtype);
 		GRBfreemodel(model); /* free model memory*/
 		GRBfreeenv(env); /* free environment memory*/
 		return 0;
@@ -342,6 +366,12 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 	error = GRBupdatemodel(model);
 	if(error){
 		printf("Error %d : in GRBupdatemodel: %s\n", error, GRBgeterrormsg(env));
+		free(sol);
+		free(intSol);
+		free(ind);
+		free(val);
+		free(obj);
+		free(vtype);
 		GRBfreemodel(model); /* free model memory*/
 		GRBfreeenv(env); /* free environment memory*/
 		return 0;
@@ -359,6 +389,12 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 			error= GRBaddconstr(model,dim,ind,val,GRB_EQUAL,1.0,NULL);
 			if(error){
 				printf("Error %d : in GRBaddconstr: %s\n", error, GRBgeterrormsg(env));
+				free(sol);
+				free(intSol);
+				free(ind);
+				free(val);
+				free(obj);
+				free(vtype);
 				GRBfreemodel(model); /* free model memory*/
 				GRBfreeenv(env); /* free environment memory*/
 				return 0;
@@ -377,6 +413,12 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 			error= GRBaddconstr(model,dim,ind,val,GRB_EQUAL,1.0,NULL);
 			if(error){
 				printf("Error %d : in GRBaddconstr: %s\n", error, GRBgeterrormsg(env));
+				free(sol);
+				free(intSol);
+				free(ind);
+				free(val);
+				free(obj);
+				free(vtype);
 				GRBfreemodel(model); /* free model memory*/
 				GRBfreeenv(env); /* free environment memory*/
 				return 0;
@@ -395,6 +437,12 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 			error= GRBaddconstr(model,dim,ind,val,GRB_EQUAL,1.0,NULL);
 			if(error){
 				printf("Error %d : in GRBaddconstr: %s\n", error, GRBgeterrormsg(env));
+				free(sol);
+				free(intSol);
+				free(ind);
+				free(val);
+				free(obj);
+				free(vtype);
 				GRBfreemodel(model); /* free model memory*/
 				GRBfreeenv(env); /* free environment memory*/
 				return 0;
@@ -418,6 +466,12 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 				error = GRBaddconstr(model,dim,ind,val,GRB_EQUAL,1.0,NULL);
 				if(error){
 					printf("Error %d : in GRBaddconstr: %s\n", error, GRBgeterrormsg(env));
+					free(sol);
+					free(intSol);
+					free(ind);
+					free(val);
+					free(obj);
+					free(vtype);
 					GRBfreemodel(model); /* free model memory*/
 					GRBfreeenv(env); /* free environment memory*/
 					return 0;
@@ -440,6 +494,12 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 				 for the certain X that's in the i*dim*dim+j*dim+k place in variables array.*/
 				if(error){
 					printf("Error %d : in GRBaddconstr: %s\n", error, GRBgeterrormsg(env));
+					free(sol);
+					free(intSol);
+					free(ind);
+					free(val);
+					free(obj);
+					free(vtype);
 					GRBfreemodel(model); /* free model memory*/
 					GRBfreeenv(env); /* free environment memory*/
 					return 0;
@@ -452,6 +512,12 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 	error = GRBoptimize(model);
 	if(error){
 		printf("Error %d : in GRBoptimize: %s\n", error, GRBgeterrormsg(env));
+		free(sol);
+		free(intSol);
+		free(ind);
+		free(val);
+		free(obj);
+		free(vtype);
 		GRBfreemodel(model); /* free model memory*/
 		GRBfreeenv(env); /* free environment memory*/
 		return 0;
@@ -462,6 +528,12 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 	 by retrieving the values of the status attribute.*/
 	if(error){
 		printf("Error %d : in GRBgetintattr: %s\n", error, GRBgeterrormsg(env));
+		free(sol);
+		free(intSol);
+		free(ind);
+		free(val);
+		free(obj);
+		free(vtype);
 		GRBfreemodel(model); /* free model memory*/
 		GRBfreeenv(env); /* free environment memory*/
 		return 0;
@@ -470,6 +542,12 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 	/*case of infinite or unbounded solution*/
 	if(optimstatus == GRB_INF_OR_UNBD){
 		printf("Unsolvable\n");
+		free(sol);
+		free(intSol);
+		free(ind);
+		free(val);
+		free(obj);
+		free(vtype);
 		GRBfreemodel(model); /* free model memory*/
 		GRBfreeenv(env); /* free environment memory*/
 		return -1;
@@ -478,6 +556,12 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 	error = GRBgetdblattrarray(model,GRB_DBL_ATTR_X,0,dim*dim*dim,sol);
 	if(error){
 		printf("Error %d : in GRBgetdblattarray: %s\n", error, GRBgeterrormsg(env));
+		free(sol);
+		free(intSol);
+		free(ind);
+		free(val);
+		free(obj);
+		free(vtype);
 		GRBfreemodel(model); /* free model memory*/
 		GRBfreeenv(env); /* free environment memory*/
 		return 0;
@@ -501,6 +585,12 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 				}
 			}
 		}
+		free(sol);
+		free(intSol);
+		free(ind);
+		free(val);
+		free(obj);
+		free(vtype);
 		GRBfreemodel(model); /* free model memory*/
 		GRBfreeenv(env); /* free environment memory*/
 		return 1;
@@ -508,6 +598,12 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 
 
 	/*case there was a runtime problem- Free model*/
+	free(sol);
+	free(intSol);
+	free(ind);
+	free(val);
+	free(obj);
+	free(vtype);
 	GRBfreemodel(model); /* free model memory*/
 	GRBfreeenv(env); /* free environment memory*/
 	return 0;
