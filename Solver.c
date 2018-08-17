@@ -347,7 +347,7 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 			} /*end of if error*/
 		}/* end of specific  [i,j] cell*/
 	}/* go through all possible [i,j]*/
-
+	printf("AAAAAA CELL/n");
 
 	/*Add row constraints - for each i index*/
 	for(k=0;k<dim;k++){
@@ -363,7 +363,7 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 			} /*end of if error*/
 		}/* end of specific  [i,j] cell*/
 	}/* go through all possible [i,j]*/
-
+	printf("AAAAAA ROW/n");
 
 	/*Add col constraints - for each j index*/
 	for(k=0;k<dim;k++){
@@ -379,7 +379,7 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 			} /*end of if error*/
 		}/* end of specific  [i,j] cell*/
 	}/* go through all possible [i,j]*/
-
+	printf("AAAAAA COL/n");
 
 	/*Add block constraints*/
 	for(k=0;k<dim;k++){
@@ -398,11 +398,10 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 					printf("Error %d : in GRBaddconstr: %s\n", error, GRBgeterrormsg(env));
 					goto QUIT;
 				} /*end of if error*/
-
 			}
-
 		}
 	}
+	printf("AAAAAA BLOCK/n");
 
 
 	/*Add fixed-cell constraints*/
@@ -421,6 +420,7 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 			}
 		}
 	}
+	printf("AAAAAA FIXED/n");
 
 	/*Optimize model*/
 	error = GRBoptimize(model);
