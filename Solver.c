@@ -111,6 +111,7 @@ void Autofill(int** board, UndoRedoList *urli, int blockHeight, int blockWidth)
 		}
 		urli->curr=urli->tail;
 	}
+	free(neighborsBin);
 }
 
 /*
@@ -262,10 +263,10 @@ int numSols(int** board, int blockHeight, int blockWidth)
 		*/
 	}
 	while(rec->head!=NULL);
-	if(n!=NULL)
-		destroyStackNode(n);
+	/*if(n!=NULL)
+		destroyStackNode(n);*/
 	recStackDestroyer(rec);
-
+	free(bin);
 	return sols;
 }
 

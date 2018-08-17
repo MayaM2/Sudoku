@@ -177,13 +177,23 @@ int isBoardEmpty(int** board, int dim){
  */
 void MainMemoryFreer()
 {
+	int i=0;
 	/*freeing if needed*/
-	if(board!=NULL)
+	if(board!=NULL){
+		for(i=0;i<dim;i++)
+			free(board[i]);
 		free(board);
-	if(fixed!=NULL)
+	}
+	if(fixed!=NULL){
+		for(i=0;i<dim;i++)
+			free(fixed[i]);
 		free(fixed);
-	if(solvedBoard !=NULL)
-		free(solvedBoard);
+	}
+	if(solvedBoard !=NULL){
+			for(i=0;i<dim;i++)
+				free(solvedBoard[i]);
+			free(solvedBoard);
+	}
 	if(undoRedo!=NULL)
 		undoRedoDestroyer(undoRedo);
 }
