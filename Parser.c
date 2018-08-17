@@ -19,6 +19,9 @@
 int IsInteger(const char* s)
 {
 	int i=0;
+	if(s==NULL){
+		return 0;
+	}
 	for(i = 0; (unsigned)i < strlen(s); i ++)
 	{
 		/*ASCII value of 0 = 48, 9 = 57*/
@@ -35,6 +38,12 @@ int IsInteger(const char* s)
 void ParseCommand(Command *currCommand){
 	char readFromUser[256];
 	char* userInp[4];
+
+	userInp[0]=NULL;
+	userInp[1]=NULL;
+	userInp[2]=NULL;
+	userInp[3]=NULL;
+
 
 	/*Don't want to catch game prints...*/
 	setvbuf(stdin,NULL,_IONBF,0);
