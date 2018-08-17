@@ -289,7 +289,7 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 	int *intSol = (int*)calloc(dim*dim*dim,sizeof(int*));
 	int *ind = (int*)calloc(dim,sizeof(int*));
 	double *val = (double*)calloc(dim,sizeof(double*));
-	double *obj = (double*)calloc(dim*dim*dim,sizeof(double*)); /*coeffs of obj. function*/
+	double obj[1]; /*coeffs of obj. function*/
 	char *vtype = (char*)calloc(dim*dim*dim,sizeof(char*));
 	int optimstatus;
 	int i=0, j=0, k=0, ii=0,jj=0,count=0;
@@ -310,23 +310,18 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 	}
 
 	/*prevent prints to stdout*/
-	/*error = GRBsetdblparam(GRBgetenv(model), GRB_OUT_PUT_FLAG, 0);*/
+	/*error = GRBsetintattr(model, GRB_OUT_PUT_FLAG, 0);*/
 
 	/*Add variables*/
-	for(i=0; i<dim*dim*dim;i++){
-		obj[i]=1.0;
+	obj[0]=0.0;
+	for(i=0;i<dim*dim*dim;i++){
 		vtype[i]=GRB_BINARY;
 	}
+
+
 	error = GRBaddvars(model,dim*dim*dim,0,NULL,NULL,NULL,obj,NULL,NULL,vtype,NULL);
 	if(error){
 		printf("Error %d : in GRBaddvars: %s\n", error, GRBgeterrormsg(env));
-		goto QUIT;
-	}
-
-	/*change objective sense to maximization - default is min*/
-	error = GRBsetintattr(model, GRB_INT_ATTR_MODELSENSE, GRB_MAXIMIZE);
-	if(error){
-		printf("Error %d : in GRBsetintattr: %s\n", error, GRBgeterrormsg(env));
 		goto QUIT;
 	}
 
@@ -336,8 +331,6 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 		printf("Error %d : in GRBupdatemodel: %s\n", error, GRBgeterrormsg(env));
 		goto QUIT;
 	}
-
-
 
 	/*Add constrains: there are five kinds: cells, rows, cols, block, fixed*/
 
@@ -355,7 +348,6 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 			} /*end of if error*/
 		}/* end of specific  [i,j] cell*/
 	}/* go through all possible [i,j]*/
-	printf("AAAAAA CELL/n");
 
 	/*Add row constraints - for each i index*/
 	for(k=0;k<dim;k++){
@@ -371,7 +363,6 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 			} /*end of if error*/
 		}/* end of specific  [i,j] cell*/
 	}/* go through all possible [i,j]*/
-	printf("AAAAAA ROW/n");
 
 	/*Add col constraints - for each j index*/
 	for(k=0;k<dim;k++){
@@ -387,7 +378,6 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 			} /*end of if error*/
 		}/* end of specific  [i,j] cell*/
 	}/* go through all possible [i,j]*/
-	printf("AAAAAA COL/n");
 
 	/*Add block constraints*/
 	for(k=0;k<dim;k++){
@@ -409,7 +399,6 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 			}
 		}
 	}
-	printf("AAAAAA BLOCK/n");
 
 
 	/*Add fixed-cell constraints*/
@@ -417,7 +406,7 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 		for(j=0;j<dim;j++){
 			if(fixed[i][j]==1){ /* if certain cell is set to be fixed*/
 				k=board[i][j];
-				ind[0]=i*dim*dim+j*dim+k;
+				ind[0]=i*dim*dim+j*dim+k-1;
 				val[0]=1.0; /*coeff of constraint is 1*/
 				error = GRBaddconstr(model,1,ind,val,GRB_EQUAL,1.0,NULL); /*add constraint: 1*X=1
 				 for the certain X that's in the i*dim*dim+j*dim+k place in variables array.*/
@@ -428,7 +417,6 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 			}
 		}
 	}
-	printf("AAAAAA FIXED/n");
 
 	/*Optimize model*/
 	error = GRBoptimize(model);
@@ -452,7 +440,6 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 		free(intSol);
 		free(ind);
 		free(val);
-		free(obj);
 		free(vtype);
 		GRBfreemodel(model); /* free model memory*/
 		GRBfreeenv(env); /* free environment memory*/
@@ -487,7 +474,6 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 		free(intSol);
 		free(ind);
 		free(val);
-		free(obj);
 		free(vtype);
 		GRBfreemodel(model); /* free model memory*/
 		GRBfreeenv(env); /* free environment memory*/
@@ -500,7 +486,6 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 	free(intSol);
 	free(ind);
 	free(val);
-	free(obj);
 	free(vtype);
 	GRBfreemodel(model); /* free model memory*/
 	GRBfreeenv(env); /* free environment memory*/
