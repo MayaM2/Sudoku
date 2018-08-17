@@ -120,7 +120,7 @@ int validate(int** board,int blockHeight, int blockWidth, int dim, int printMess
 			return 0;
 		}
 		passed = ILPSolver(board,fixed,solvedBoard,blockHeight,blockWidth,dim);
-		if(passed){
+		if(passed==1){
 			if(printMessage){
 				printf("Validation passed: board is solvable\n");
 			}
