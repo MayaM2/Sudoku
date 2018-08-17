@@ -286,8 +286,8 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 	int error = 0;
 	double sol[dim*dim*dim];
 	int intSol[dim*dim*dim];
-	int ind[dim*dim*dim];
-	double val[dim*dim*dim];
+	int ind[dim*dim];
+	double val[dim*dim];
 	double obj[dim*dim*dim]; /*coeffs of obj. function*/
 	char vtype[dim*dim*dim];
 	int optimstatus;
