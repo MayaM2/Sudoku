@@ -313,7 +313,7 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 	}
 
 	/*prevent prints to stdout*/
-	model.getEnv().set(GRB_IntParam_OutputFlag, 0);
+	/*error = GRBsetdblparam(GRBgetenv(model), GRB_OUT_PUT_FLAG, 0);*/
 
 	/*Add variables*/
 	for(i=0; i<dim*dim*dim;i++){
@@ -467,6 +467,13 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 		return 0;
 	}
 
+	/*case of infinite or unbounded solution*/
+	if(optimstatus == GRB_INF_OR_UNBD){
+		printf("Unsolvable\n");
+		GRBfreemodel(model); /* free model memory*/
+		GRBfreeenv(env); /* free environment memory*/
+		return -1;
+	}
 
 	error = GRBgetdblattrarray(model,GRB_DBL_ATTR_X,0,dim*dim*dim,sol);
 	if(error){
@@ -475,6 +482,7 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 		GRBfreeenv(env); /* free environment memory*/
 		return 0;
 	}
+
 
 	/*case an optimum was found*/
 	if(optimstatus == GRB_OPTIMAL){
@@ -498,13 +506,6 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 		return 1;
 	}
 
-	/*case of infinite or unbounded solution*/
-	if(optimstatus == GRB_INF_OR_UNBD){
-		printf("Unsolvable\n");
-		GRBfreemodel(model); /* free model memory*/
-		GRBfreeenv(env); /* free environment memory*/
-		return -1;
-	}
 
 	/*case there was a runtime problem- Free model*/
 	GRBfreemodel(model); /* free model memory*/
