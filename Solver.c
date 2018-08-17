@@ -286,12 +286,11 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 	int error = 0;
 	double sol[dim*dim*dim];
 	int intSol[dim*dim*dim];
-	int ind[dim];
-	double val[dim];
-	double obj[dim*dim*dim]; //coeffs of obj. function
+	int ind[dim*dim*dim];
+	double val[dim*dim*dim];
+	double obj[dim*dim*dim]; /*coeffs of obj. function*/
 	char vtype[dim*dim*dim];
 	int optimstatus;
-	double objval;
 	int i=0, j=0, k=0, ii=0,jj=0,count=0;
 
 	/*Create environment*/
@@ -312,6 +311,9 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 		GRBfreeenv(env); /* free environment memory*/
 		return 0;
 	}
+
+	/*prevent prints to stdout*/
+	model.getEnv().set(GRB_IntParam_OutputFlag, 0);
 
 	/*Add variables*/
 	for(i=0; i<dim*dim*dim;i++){
