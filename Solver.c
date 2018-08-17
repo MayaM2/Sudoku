@@ -366,8 +366,8 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 
 
 	/*Add col constraints - for each j index*/
-	for(i=0;i<dim;i++){
-		for(k=0;k<dim;k++){
+	for(k=0;k<dim;k++){
+		for(i=0;i<dim;i++){
 			for(j=0;j<dim;j++){ /*sum variable values over all the col*/
 				ind[j]=i*dim*dim+j*dim+k;
 				val[j]=1.0;
@@ -411,7 +411,7 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 			if(fixed[i][j]==1){ /* if certain cell is set to be fixed*/
 				k=board[i][j];
 				ind[0]=i*dim*dim+j*dim+k;
-				val[0]=1; /*coeff of constraint is 1*/
+				val[0]=1.0; /*coeff of constraint is 1*/
 				error = GRBaddconstr(model,1,ind,val,GRB_EQUAL,1.0,NULL); /*add constraint: 1*X=1
 				 for the certain X that's in the i*dim*dim+j*dim+k place in variables array.*/
 				if(error){
