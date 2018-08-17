@@ -289,7 +289,7 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 	int *ind = (int*)calloc(dim*dim,sizeof(int*));
 	double *val = (double*)calloc(dim*dim,sizeof(double*));
 	double *obj = (double*)calloc(dim*dim*dim,sizeof(double*)); /*coeffs of obj. function*/
-	double *vtype = (double*)calloc(dim*dim*dim,sizeof(double*));
+	char *vtype = (char*)calloc(dim*dim*dim,sizeof(char*));
 	int optimstatus;
 	int i=0, j=0, k=0, ii=0,jj=0,count=0;
 
