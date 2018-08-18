@@ -425,6 +425,11 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 		goto QUIT;
 	}
 
+	/*write model to sudoku.lp */
+	error = GRBwrite(model,"sudoku.lp");
+	if(error) goto QUIT;
+
+
 	/*Capture solution information*/
 	error = GRBgetintattr(model, GRB_INT_ATTR_STATUS,&optimstatus); /*query the status of the optimization process
 	 by retrieving the values of the status attribute.*/
@@ -448,7 +453,7 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 
 	error = GRBgetdblattrarray(model,GRB_DBL_ATTR_X,0,dim*dim*dim,sol);
 	if(error){
-		printf("Error %d : in GRBgetdblattarray: %s\n", error, GRBgeterrormsg(env));
+		printf("Error %d : in GRBgetdblattrarray: %s\n", error, GRBgeterrormsg(env));
 		goto QUIT;
 	}
 
