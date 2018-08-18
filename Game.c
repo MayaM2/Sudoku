@@ -98,6 +98,46 @@ void printBoard()
 }
 
 
+/* DEBUGGING*/
+void printSolvedBoard()
+{
+	int i=0,j=0;
+	for(;i<dim;i++){
+		if(i%blockHeight==0){
+			for(j=0;j<4*dim+blockWidth+1;j++)
+				printf("-");
+			printf("\n");
+		}
+		j=0;
+		for(;j<dim;j++){
+			if(j%blockWidth==0)
+				printf("|");
+			if(solvedBoard[i][j]==0)
+				printf("    ");
+			else{
+				printf(" %2d",solvedBoard[i][j]);
+				if(fixed[i][j]==1)
+					printf(".");
+				else{
+					if( (gameMode==EDIT || markErrors==1) && isErroneous(j,i)==1)
+						printf("*");
+					else
+						printf(" ");
+				}
+			}
+			if(j==dim-1)
+				printf("|\n");
+
+		}
+	}
+	for(j=0;j<4*dim+blockWidth+1;j++)
+		printf("-");
+	printf("\n");
+}
+
+
+
+
 /*
  * returns 1 if a given num is between lower and upper given numbers inclusively.
  * 0 therwise.
@@ -330,6 +370,7 @@ int randomFill(int X,int *arri,int *arrj){
 	}
 	/* case all X cells were filled*/
 	printf("in randomFill : SUCCESS all cells are filled \n");
+	printBoard();
 	return 1;
 }
 
@@ -388,8 +429,23 @@ int generate(int X, int Y){
 		/* if we were able to assign all X cells with valid values - we need to make sure the board is solvable with ILP*/
 		if(cellAssignSuccesss){
 			printf("in generate : call ILPSolver\n");
+
+			/*update fixedBoard*/
+
+
+			for(i=0;i<dim;i++){
+				for(j=0;j<dim;j++){
+					fixed[i][j]=0; /* make sure fixed is empty */
+					if(board[i][j]!=0){
+						fixed[i][j]=1;
+					}
+				}
+			}
+
 			if(ILPSolver(board,fixed,solvedBoard,blockHeight,blockWidth,dim)){/* if there is a solution*/
 				printf("in generate : call to ILPSolver successful\n");
+				/*DEBUGGING we'll print solvedboard */
+				printSolvedBoard();
 				step1Success = 1;
 			}
 		}
