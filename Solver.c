@@ -443,14 +443,13 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 		return -1;
 	}
 
-	error = GRBgetdblattrarray(model,GRB_DBL_ATTR_X,0,dim*dim*dim,sol);
-	if(error){
-		goto QUIT;
-	}
-
-
 	/*case an optimum was found*/
 	if(optimstatus == GRB_OPTIMAL){
+
+		error = GRBgetdblattrarray(model,GRB_DBL_ATTR_X,0,dim*dim*dim,sol);
+		if(error){
+			goto QUIT;
+		}
 		/*update intSol to int values of double sol array*/
 		for(i=0;i<dim*dim*dim;i++){
 					intSol[i]= floor(sol[i]);
@@ -475,6 +474,9 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 		GRBfreemodel(model); /* free model memory*/
 		GRBfreeenv(env); /* free environment memory*/
 		return 1;
+	}
+	else{
+		goto QUIT;
 	}
 
 	QUIT:
