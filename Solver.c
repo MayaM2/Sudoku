@@ -381,8 +381,8 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 
 	/*Add block constraints*/
 	for(k=0;k<dim;k++){
-		for(ii=0;ii<blockHeight;ii++){
-			for(jj=0;jj<blockWidth;jj++){
+		for(ii=0;ii<blockWidth;ii++){
+			for(jj=0;jj<blockHeight;jj++){
 				count=0;
 				for(i=ii*blockHeight; i<(ii+1)*blockHeight;i++){
 					for(j=jj*blockWidth;j<(jj+1)*blockWidth;j++){
