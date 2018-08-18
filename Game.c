@@ -273,7 +273,7 @@ int problemCellAssignment(int i, int j){
 	for(; x<dim;x++){
 		OpArr[x]=1;
 	}
-	printf("in problemCellAssignment : OpArr initiated ");
+	printf("in problemCellAssignment : OpArr initiated \n");
 
 	while(numOptions>0){ /* while there are still value options to try*/
 		x = rand() % numOptions; /* x between 0 and (numOptions-1)*/
@@ -318,6 +318,7 @@ int randomFill(int X,int *arri,int *arrj){
 		printf("in randomFill : fill cel i=%d j=%d   with k=%d\n",arri[count],arrj[count],k);
 		if(isBoardErroneous()){ /* there was a problem with the first try of cell's assignment*/
 			printf("in randomFill : board is erroneous, call problemCellAssignment \n");
+			printBoard(); /*DEBUGGING*/
 			status = (problemCellAssignment(arri[count],arrj[count])); /* try randomly all options.*/
 			if(status==0){
 				printf("in randomFill : problemCellAssignment failed \n");
@@ -361,10 +362,19 @@ int generate(int X, int Y){
 				randCount++;
 			}
 		}/*now X cells were randomly chosen*/
+
+		/*re clean board*/
+		printf("re clean board \n");
+		for(i=0; i<dim; i++){
+			for(j=0;j<dim; j++){
+				board[i][j]=0;
+			}
+		}
+
 		/*next - we'll try to fill them randomly with valid values*/
 		if(randomFill(X,arri,arrj)){ /*try to randomly fill chosen cells with legal values*/
 			cellAssignSuccesss = 1; /* case succeed*/
-			printf("in generate : all cells filled");
+			printf("in generate : all cells filled\n");
 		}
 		else{ /* case failed - wipe out the board back*/
 			printf("in generate : problem with cell-filling, wiping board\n");
@@ -377,9 +387,9 @@ int generate(int X, int Y){
 
 		/* if we were able to assign all X cells with valid values - we need to make sure the board is solvable with ILP*/
 		if(cellAssignSuccesss){
-			printf("in generate : call ILPSolver");
+			printf("in generate : call ILPSolver\n");
 			if(ILPSolver(board,fixed,solvedBoard,blockHeight,blockWidth,dim)){/* if there is a solution*/
-				printf("in generate : call to ILPSolver successful");
+				printf("in generate : call to ILPSolver successful\n");
 				step1Success = 1;
 			}
 		}
