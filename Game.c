@@ -637,7 +637,7 @@ switch(inpCommand->commands){
 					return;
 				}
 				else{
-					printf("Hint: set cell to %d\n",solvedBoard[inpCommand->arg1][inpCommand->arg2]);
+					printf("Hint: set cell to %d\n",solvedBoard[inpCommand->arg1-1][inpCommand->arg2-1]);
 					return;
 				}
 			}
