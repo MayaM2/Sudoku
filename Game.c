@@ -528,29 +528,28 @@ switch(inpCommand->commands){
 
 	case GENERATE_COMMAND:
 		if(gameMode == EDIT){
-			if(inpCommand->validity==1){ /* checks if any integers were given as X Y Z */
-				if(!isBoardEmpty(board,dim)){
-					printf("Error: board is not empty\n");
-					break;
-				}
-				if(numInRange(inpCommand->arg1,0,dim*dim)&&numInRange(inpCommand->arg2,0,dim*dim)){ /* checks if X Y Z are in range 1-Dim*Dim */
-					/* in this case, we can generate a new board!! */
-					if(!generate(inpCommand->arg1,inpCommand->arg2, dim)){ /*generation process*/
-						for(i=0;i<dim;i++){ /* if fails - reclean board*/
-							for(j=0;j<dim;j++){
-								board[i][j]=0;
-							}
+			if(!isBoardEmpty(board,dim)){
+				printf("Error: board is not empty\n");
+				break;
+			}
+			/* checks if any integers were given as X Y, and wheather they are in the right range */
+			if((inpCommand->validity==1)&&numInRange(inpCommand->arg1,0,dim*dim)&&numInRange(inpCommand->arg2,0,dim*dim)){ /* checks if X Y Z are in range 0-Dim*Dim */
+				/* in this case, we can generate a new board!! */
+				if(!generate(inpCommand->arg1,inpCommand->arg2, dim)){ /*generation process*/
+					for(i=0;i<dim;i++){ /* if fails - reclean board*/
+						for(j=0;j<dim;j++){
+							board[i][j]=0;
 						}
-						printf("Error: puzzle generator failed\n");
 					}
-					else{/*puzzle generation successful*/
-						printBoard(board);
-					}
-				}	/* end of numbers in range*/
-				else{ /* numbers are not in range*/
-					printf("Error: value not in range 0-%d\n",dim*dim);
-					return;
+					printf("Error: puzzle generator failed\n");
 				}
+				else{/*puzzle generation successful*/
+					printBoard(board);
+				}
+			}	/* end of numbers in range*/
+			else{ /* numbers are not in range*/
+				printf("Error: value not in range 0-%d\n",dim*dim);
+				return;
 			}
 		}
 		else{/* not in edit or solve mode */
