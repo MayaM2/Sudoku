@@ -302,6 +302,10 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 		goto QUIT;
 	}
 
+	/*prevent prints to stdout*/
+	error = GRBsetintparam(env, "OutputFlag", 0);
+	if (error) goto QUIT;
+
 	/*Create empty model*/
 	error = GRBnewmodel(env,&model,"ILPSolve",0,NULL,NULL,NULL,NULL,NULL);
 	if (error || env == NULL){
@@ -309,8 +313,6 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 		goto QUIT;
 	}
 
-	/*prevent prints to stdout*/
-	/*error = GRBsetintattr(model, GRB_OUT_PUT_FLAG, 0);*/
 
 	/*Add variables*/
 	for(i=0;i<dim*dim*dim;i++){
@@ -417,6 +419,7 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 			}
 		}
 	}
+
 
 	/*Optimize model*/
 	error = GRBoptimize(model);
