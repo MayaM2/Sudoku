@@ -289,7 +289,7 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 	int *intSol = (int*)calloc(dim*dim*dim,sizeof(int*));
 	int *ind = (int*)calloc(dim,sizeof(int*));
 	double *val = (double*)calloc(dim,sizeof(double*));
-	double obj[1]; /*coeffs of obj. function*/
+	double *obj = (double*)calloc(dim*dim*dim,sizeof(double*)); /*coeffs of obj. function*/
 	char *vtype = (char*)calloc(dim*dim*dim,sizeof(char*));
 	int optimstatus;
 	int i=0, j=0, k=0, ii=0,jj=0,count=0;
@@ -313,8 +313,8 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 	/*error = GRBsetintattr(model, GRB_OUT_PUT_FLAG, 0);*/
 
 	/*Add variables*/
-	obj[0]=0.0;
 	for(i=0;i<dim*dim*dim;i++){
+		obj[i]=0.0;
 		vtype[i]=GRB_BINARY;
 	}
 
@@ -445,6 +445,7 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 		free(intSol);
 		free(ind);
 		free(val);
+		free(obj);
 		free(vtype);
 		GRBfreemodel(model); /* free model memory*/
 		GRBfreeenv(env); /* free environment memory*/
@@ -479,6 +480,7 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 		free(intSol);
 		free(ind);
 		free(val);
+		free(obj);
 		free(vtype);
 		GRBfreemodel(model); /* free model memory*/
 		GRBfreeenv(env); /* free environment memory*/
@@ -491,6 +493,7 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 	free(intSol);
 	free(ind);
 	free(val);
+	free(obj);
 	free(vtype);
 	GRBfreemodel(model); /* free model memory*/
 	GRBfreeenv(env); /* free environment memory*/
