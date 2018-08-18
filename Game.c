@@ -357,8 +357,8 @@ int generate(int X, int Y){
 			arrj[randCount] = rand() % dim;
 			if(board[arri[randCount]][arrj[randCount]]==0){ /*cell was not already chosen..*/
 				printf("in generate: chosen cell num %d is  i= %d , j=%d\n",randCount,arri[randCount],arrj[randCount]);
-				randCount++;
 				board[arri[randCount]][arrj[randCount]]=1;
+				randCount++;
 			}
 		}/*now X cells were randomly chosen*/
 		/*next - we'll try to fill them randomly with valid values*/
@@ -367,7 +367,7 @@ int generate(int X, int Y){
 			printf("in generate : all cells filled");
 		}
 		else{ /* case failed - wipe out the board back*/
-			printf("in generate : problem with cell-filling, wiping board");
+			printf("in generate : problem with cell-filling, wiping board\n");
 			for(i=0; i<dim; i++){
 				for(j=0;j<dim; j++){
 					board[i][j]=0;
