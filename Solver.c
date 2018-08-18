@@ -298,7 +298,6 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 	error = GRBloadenv(&env,"sudoku.log");
 	/*here no log file will be written since an empty string was given.*/
 	if (error || env == NULL){
-		printf("Error %d : in GRBloadenv: %s\n", error, GRBgeterrormsg(env));
 		goto QUIT;
 	}
 
@@ -309,7 +308,6 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 	/*Create empty model*/
 	error = GRBnewmodel(env,&model,"ILPSolve",0,NULL,NULL,NULL,NULL,NULL);
 	if (error || env == NULL){
-		printf("Error %d : in GRBnewmodel: %s\n", error, GRBgeterrormsg(env));
 		goto QUIT;
 	}
 
@@ -323,14 +321,12 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 
 	error = GRBaddvars(model,dim*dim*dim,0,NULL,NULL,NULL,obj,NULL,NULL,vtype,NULL);
 	if(error){
-		printf("Error %d : in GRBaddvars: %s\n", error, GRBgeterrormsg(env));
 		goto QUIT;
 	}
 
 	/*Update model - to integrate new variables*/
 	error = GRBupdatemodel(model);
 	if(error){
-		printf("Error %d : in GRBupdatemodel: %s\n", error, GRBgeterrormsg(env));
 		goto QUIT;
 	}
 
@@ -345,7 +341,6 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 			}
 			error= GRBaddconstr(model,dim,ind,val,GRB_EQUAL,1.0,NULL);
 			if(error){
-				printf("Error %d : in GRBaddconstr: %s\n", error, GRBgeterrormsg(env));
 				goto QUIT;
 			} /*end of if error*/
 		}/* end of specific  [i,j] cell*/
@@ -360,7 +355,6 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 			}
 			error= GRBaddconstr(model,dim,ind,val,GRB_EQUAL,1.0,NULL);
 			if(error){
-				printf("Error %d : in GRBaddconstr: %s\n", error, GRBgeterrormsg(env));
 				goto QUIT;
 			} /*end of if error*/
 		}/* end of specific  [i,j] cell*/
@@ -375,7 +369,6 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 			}
 			error= GRBaddconstr(model,dim,ind,val,GRB_EQUAL,1.0,NULL);
 			if(error){
-				printf("Error %d : in GRBaddconstr: %s\n", error, GRBgeterrormsg(env));
 				goto QUIT;
 			} /*end of if error*/
 		}/* end of specific  [i,j] cell*/
@@ -395,7 +388,6 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 				}
 				error = GRBaddconstr(model,dim,ind,val,GRB_EQUAL,1.0,NULL);
 				if(error){
-					printf("Error %d : in GRBaddconstr: %s\n", error, GRBgeterrormsg(env));
 					goto QUIT;
 				} /*end of if error*/
 			}
@@ -413,7 +405,6 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 				error = GRBaddconstr(model,1,ind,val,GRB_EQUAL,1.0,NULL); /*add constraint: 1*X=1
 				 for the certain X that's in the i*dim*dim+j*dim+k place in variables array.*/
 				if(error){
-					printf("Error %d : in GRBaddconstr: %s\n", error, GRBgeterrormsg(env));
 					goto QUIT;
 				} /*end of if error*/
 			}
@@ -424,7 +415,6 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 	/*Optimize model*/
 	error = GRBoptimize(model);
 	if(error){
-		printf("Error %d : in GRBoptimize: %s\n", error, GRBgeterrormsg(env));
 		goto QUIT;
 	}
 
@@ -437,13 +427,11 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 	error = GRBgetintattr(model, GRB_INT_ATTR_STATUS,&optimstatus); /*query the status of the optimization process
 	 by retrieving the values of the status attribute.*/
 	if(error){
-		printf("Error %d : in GRBgetintattr: %s\n", error, GRBgeterrormsg(env));
 		goto QUIT;
 	}
 
 	/*case of infinite or unbounded solution*/
 	if(optimstatus == GRB_INF_OR_UNBD){
-		printf("Unsolvable\n");
 		free(sol);
 		free(intSol);
 		free(ind);
@@ -457,7 +445,6 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 
 	error = GRBgetdblattrarray(model,GRB_DBL_ATTR_X,0,dim*dim*dim,sol);
 	if(error){
-		printf("Error %d : in GRBgetdblattrarray: %s\n", error, GRBgeterrormsg(env));
 		goto QUIT;
 	}
 
