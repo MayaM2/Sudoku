@@ -341,6 +341,8 @@ int generate(int X, int Y){
 	int randCount = 0;
 	int* arri = (int*)calloc(X,sizeof(int));
 	int* arrj = (int*)calloc(X,sizeof(int));
+	int* arri2 = (int*)calloc(Y,sizeof(int)); /* for step 2 */
+	int* arrj2 = (int*)calloc(Y,sizeof(int));
 	/*step 1: up to 1,000 tries: choose X cells, fill them randomly with valid values and try to solve using ILP*/
 	while(!step1Success && tries<1000){
 		randCount = 0;
@@ -397,6 +399,8 @@ int generate(int X, int Y){
 	if(!step1Success){ /* case while loop stopped after 1,000 unsuccessful iterations*/
 		free(arri);
 		free(arrj);
+		free(arri2);
+		free(arrj2);
 		return 0;
 	}
 	/* continue to step 2: erase Y randomly chosen cells and clear their value. Print board,
@@ -411,16 +415,17 @@ int generate(int X, int Y){
 	/*choose Y random cells to clean*/
 	randCount = 0;
 	while(randCount<Y){
-		arri[randCount] = rand() % dim; /* [i][j] coordinated are between  0 - (dim-1)*/
-		arrj[randCount] = rand() % dim;
-		if(!(board[arri[randCount]][arrj[randCount]]==0)){ /*cell was not already chosen..*/
-			board[arri[randCount]][arrj[randCount]]=0;
+		arri2[randCount] = rand() % dim; /* [i][j] coordinated are between  0 - (dim-1)*/
+		arrj2[randCount] = rand() % dim;
+		if(!(board[arri2[randCount]][arrj2[randCount]]==0)){ /*cell was not already chosen..*/
+			board[arri2[randCount]][arrj2[randCount]]=0;
 			randCount++;
 		}
 	}
-
 	free(arri);
 	free(arrj);
+	free(arri2);
+	free(arrj2);
 	return 1;
 }
 

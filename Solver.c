@@ -311,13 +311,11 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 		goto QUIT;
 	}
 
-
 	/*Add variables*/
 	for(i=0;i<dim*dim*dim;i++){
 		obj[i]=0.0;
 		vtype[i]=GRB_BINARY;
 	}
-
 
 	error = GRBaddvars(model,dim*dim*dim,0,NULL,NULL,NULL,obj,NULL,NULL,vtype,NULL);
 	if(error){
@@ -394,7 +392,6 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 		}
 	}
 
-
 	/*Add fixed-cell constraints*/
 	for(i=0;i<dim;i++){
 		for(j=0;j<dim;j++){
@@ -432,6 +429,7 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 
 	/*case of infinite or unbounded solution*/
 	if(optimstatus == GRB_INF_OR_UNBD){
+
 		free(sol);
 		free(intSol);
 		free(ind);
@@ -445,11 +443,11 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 
 	/*case an optimum was found*/
 	if(optimstatus == GRB_OPTIMAL){
-
 		error = GRBgetdblattrarray(model,GRB_DBL_ATTR_X,0,dim*dim*dim,sol);
 		if(error){
 			goto QUIT;
 		}
+
 		/*update intSol to int values of double sol array*/
 		for(i=0;i<dim*dim*dim;i++){
 					intSol[i]= floor(sol[i]);
