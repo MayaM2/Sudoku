@@ -622,12 +622,12 @@ switch(inpCommand->commands){
 					printf("Error: board contains erroneous values\n");
 					return;
 				}
-				if(fixed[inpCommand->arg1][inpCommand->arg2]==1){  /* case cell is fixed - don't execute*/
+				if(fixed[inpCommand->arg1-1][inpCommand->arg2-1]==1){  /* case cell is fixed - don't execute*/
 					printf("Error: cell is fixed\n");
 					return;
 
 				}
-				if(board[inpCommand->arg1][inpCommand->arg2]!=0){ /* case cell is not empty - don't execute*/
+				if(board[inpCommand->arg1-1][inpCommand->arg2-1]!=0){ /* case cell is not empty - don't execute*/
 					printf("Error: cell already contains a value\n");
 					return;
 				}
