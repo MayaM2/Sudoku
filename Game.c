@@ -269,7 +269,7 @@ int problemCellAssignment(int i, int j){
 	int numOptions = dim;
 	int x=0,count=0,ind=0;
 	int* OpArr = (int*)calloc(dim,sizeof(int));
-	/* Initialize OpArr with zeroes*/
+	/* Initialize OpArr with ones*/
 	for(; x<dim;x++){
 		OpArr[x]=1;
 	}
@@ -285,6 +285,7 @@ int problemCellAssignment(int i, int j){
 			}
 			ind++; /* we need i+1 which represents the actual value*/
 		}
+		ind++;
 		/* try and put value in cell*/
 		board[i][j]=ind;
 		if(!isBoardErroneous()){
@@ -308,13 +309,13 @@ int problemCellAssignment(int i, int j){
  * otherwise - a valid assignment was found - return 1.
  */
 int randomFill(int X,int *arri,int *arrj){
-	int k=0, count=0, failed=0;
+	int k=0, count=0, status=0;
 	while(count<X){
 		k = (rand() % dim)+1; /* first try any random number for cell, from range 1-dim*/
 		board[arri[count]][arrj[count]]=k;
 		if(isBoardErroneous()){ /* there was a problem with the first try of cell's assignment*/
-			failed = !(problemCellAssignment(arri[count],arrj[count])); /* try randomly all options.*/
-			if(failed==1){
+			status = (problemCellAssignment(arri[count],arrj[count])); /* try randomly all options.*/
+			if(status==0){
 				return 0; /* reached a dead end*/
 			}
 		}
@@ -332,7 +333,7 @@ int randomFill(int X,int *arri,int *arrj){
  * update the game board
  * return 1 if succeeded, 0 otherwise.
  */
-int generate(int X, int Y, int dim){
+int generate(int X, int Y){
 	int tries=0,i=0,j=0;
 	int step1Success = 0;
 	int cellAssignSuccesss = 0;
@@ -373,6 +374,7 @@ int generate(int X, int Y, int dim){
 			tries++;
 		}
 	}
+
 	if(!step1Success){ /* case while loop stopped after 1,000 unsuccessful iterations*/
 		printf("Error: puzzle generation failed\n");
 		free(arri);
@@ -535,7 +537,7 @@ switch(inpCommand->commands){
 			/* checks if any integers were given as X Y, and wheather they are in the right range */
 			if((inpCommand->validity==1)&&numInRange(inpCommand->arg1,0,dim*dim)&&numInRange(inpCommand->arg2,0,dim*dim)){ /* checks if X Y Z are in range 0-Dim*Dim */
 				/* in this case, we can generate a new board!! */
-				if(!generate(inpCommand->arg1,inpCommand->arg2, dim)){ /*generation process*/
+				if(!generate(inpCommand->arg1,inpCommand->arg2)){ /*generation process*/
 					for(i=0;i<dim;i++){ /* if fails - reclean board*/
 						for(j=0;j<dim;j++){
 							board[i][j]=0;
