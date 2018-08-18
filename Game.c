@@ -98,45 +98,6 @@ void printBoard()
 }
 
 
-/* DEBUGGING*/
-void printSolvedBoard()
-{
-	int i=0,j=0;
-	for(;i<dim;i++){
-		if(i%blockHeight==0){
-			for(j=0;j<4*dim+blockWidth+1;j++)
-				printf("-");
-			printf("\n");
-		}
-		j=0;
-		for(;j<dim;j++){
-			if(j%blockWidth==0)
-				printf("|");
-			if(solvedBoard[i][j]==0)
-				printf("    ");
-			else{
-				printf(" %2d",solvedBoard[i][j]);
-				if(fixed[i][j]==1)
-					printf(".");
-				else{
-					if( (gameMode==EDIT || markErrors==1) && isErroneous(j,i)==1)
-						printf("*");
-					else
-						printf(" ");
-				}
-			}
-			if(j==dim-1)
-				printf("|\n");
-
-		}
-	}
-	for(j=0;j<4*dim+blockWidth+1;j++)
-		printf("-");
-	printf("\n");
-}
-
-
-
 
 /*
  * returns 1 if a given num is between lower and upper given numbers inclusively.
@@ -313,7 +274,6 @@ int problemCellAssignment(int i, int j){
 	for(; x<dim;x++){
 		OpArr[x]=1;
 	}
-	printf("in problemCellAssignment : OpArr initiated \n");
 
 	while(numOptions>0){ /* while there are still value options to try*/
 		x = rand() % numOptions; /* x between 0 and (numOptions-1)*/
@@ -330,7 +290,6 @@ int problemCellAssignment(int i, int j){
 		/* try and put value in cell*/
 		board[i][j]=ind;
 		if(!isBoardErroneous()){
-			printf("in problemCellAssignment : SUCCESS for cell i = %d   j=%d  filled with %d\n", i,j,ind);
 			free(OpArr);
 			return 1; /* successful*/
 		}
@@ -355,22 +314,15 @@ int randomFill(int X,int *arri,int *arrj){
 	while(count<X){
 		k = (rand() % dim)+1; /* first try any random number for cell, from range 1-dim*/
 		board[arri[count]][arrj[count]]=k;
-		printf("in randomFill : fill cel i=%d j=%d   with k=%d\n",arri[count],arrj[count],k);
 		if(isBoardErroneous()){ /* there was a problem with the first try of cell's assignment*/
-			printf("in randomFill : board is erroneous, call problemCellAssignment \n");
-			printBoard(); /*DEBUGGING*/
 			status = (problemCellAssignment(arri[count],arrj[count])); /* try randomly all options.*/
 			if(status==0){
-				printf("in randomFill : problemCellAssignment failed \n");
 				return 0; /* reached a dead end*/
 			}
 		}
-		printf("in randomFill : move on to filling the next cell \n");
 		count++;
 	}
 	/* case all X cells were filled*/
-	printf("in randomFill : SUCCESS all cells are filled \n");
-	printBoard();
 	return 1;
 }
 
@@ -391,21 +343,18 @@ int generate(int X, int Y){
 	int* arrj = (int*)calloc(X,sizeof(int));
 	/*step 1: up to 1,000 tries: choose X cells, fill them randomly with valid values and try to solve using ILP*/
 	while(!step1Success && tries<1000){
-		printf("in generate: try = %d\n", tries);
 		randCount = 0;
 		cellAssignSuccesss = 0;
 		while(randCount<X){
 			arri[randCount] = rand() % dim; /* [i][j] coordinated are between  0 - (dim-1)*/
 			arrj[randCount] = rand() % dim;
 			if(board[arri[randCount]][arrj[randCount]]==0){ /*cell was not already chosen..*/
-				printf("in generate: chosen cell num %d is  i= %d , j=%d\n",randCount,arri[randCount],arrj[randCount]);
 				board[arri[randCount]][arrj[randCount]]=1;
 				randCount++;
 			}
 		}/*now X cells were randomly chosen*/
 
 		/*re clean board*/
-		printf("re clean board \n");
 		for(i=0; i<dim; i++){
 			for(j=0;j<dim; j++){
 				board[i][j]=0;
@@ -415,10 +364,8 @@ int generate(int X, int Y){
 		/*next - we'll try to fill them randomly with valid values*/
 		if(randomFill(X,arri,arrj)){ /*try to randomly fill chosen cells with legal values*/
 			cellAssignSuccesss = 1; /* case succeed*/
-			printf("in generate : all cells filled\n");
 		}
 		else{ /* case failed - wipe out the board back*/
-			printf("in generate : problem with cell-filling, wiping board\n");
 			for(i=0; i<dim; i++){
 				for(j=0;j<dim; j++){
 					board[i][j]=0;
@@ -428,11 +375,7 @@ int generate(int X, int Y){
 
 		/* if we were able to assign all X cells with valid values - we need to make sure the board is solvable with ILP*/
 		if(cellAssignSuccesss){
-			printf("in generate : call ILPSolver\n");
-
 			/*update fixedBoard*/
-
-
 			for(i=0;i<dim;i++){
 				for(j=0;j<dim;j++){
 					fixed[i][j]=0; /* make sure fixed is empty */
@@ -443,48 +386,43 @@ int generate(int X, int Y){
 			}
 
 			if(ILPSolver(board,fixed,solvedBoard,blockHeight,blockWidth,dim)){/* if there is a solution*/
-				printf("in generate : call to ILPSolver successful\n");
-				/*DEBUGGING we'll print solvedboard */
-				printSolvedBoard();
 				step1Success = 1;
 			}
 		}
 		else{
 			tries++;
-			printf("in generate : try num %d failed. trying again.\n",tries);
 		}
 	}
 
 	if(!step1Success){ /* case while loop stopped after 1,000 unsuccessful iterations*/
-		printf("Error: puzzle generation failed\n");
 		free(arri);
 		free(arrj);
 		return 0;
 	}
 	/* continue to step 2: erase Y randomly chosen cells and clear their value. Print board,
 	 make board the solvedBoard*/
-	printf("int generate : strating step 2 : erasing Y\n");
 	for(i=0;i<dim;i++){
 		for(j=0; j<dim; j++){
 			board[i][j] = solvedBoard[i][j];
+			fixed[i][j]=0; /*clean fixed */
 		}
 	}
+
 	/*choose Y random cells to clean*/
 	randCount = 0;
 	while(randCount<Y){
-		arri[randCount] = rand() % dim*dim; /* [i][j] coordinated are between  0 - (dim-1)*/
-		arrj[randCount] = rand() % dim*dim;
+		arri[randCount] = rand() % dim; /* [i][j] coordinated are between  0 - (dim-1)*/
+		arrj[randCount] = rand() % dim;
 		if(!(board[arri[randCount]][arrj[randCount]]==0)){ /*cell was not already chosen..*/
-			randCount++;
 			board[arri[randCount]][arrj[randCount]]=0;
+			randCount++;
 		}
 	}
-	printBoard(); /* print finished puzzle*/
+
 	free(arri);
 	free(arrj);
 	return 1;
 }
-
 
 
 /*
