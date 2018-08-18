@@ -614,7 +614,7 @@ switch(inpCommand->commands){
 	case HINT_COMMAND:
 		if(gameMode == SOLVE){
 			 /* checks if any integers were given as X Y Z */
-				if(!((inpCommand->validity==1)&&(numInRange(inpCommand->arg1,0,dim)&&numInRange(inpCommand->arg2,0,dim)))){ /* checks if X Y Z are integers in range 1-N, N=dim*/
+				if(!((inpCommand->validity==1)&&(numInRange(inpCommand->arg1,1,dim)&&numInRange(inpCommand->arg2,1,dim)))){ /* checks if X Y Z are integers in range 1-N, N=dim*/
 					printf("Error: value not in range 0-%d\n",dim);
 					return;
 				} /* end of numbers not in range*/
