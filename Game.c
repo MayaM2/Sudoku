@@ -201,7 +201,6 @@ void MainMemoryFreer()
 void MainMemoryCreator()
 {
 	int i=0;
-	MainMemoryFreer();
 	/*new allocation*/
 	board=(int**)calloc(dim,sizeof(int*));
 	fixed=(int**)calloc(dim,sizeof(int*));
@@ -217,12 +216,14 @@ void MainMemoryCreator()
 /*
  * "Hidden" function- for both openfile commands (solve and edit)
  */
-void OpenFileHelper(char* fileName)
+int OpenFileHelper(char* fileName)
 {
 	LoadFileList *li;
+	int ret=1;
 	li=LFLCreator();
-	if(openFile(li,fileName,gameMode)==1)
+	if(openFile(li,fileName,gameMode==SOLVE?1:0)==1)
 	{
+		MainMemoryFreer();
 		blockHeight=li->rowsPerBlock;
 		blockWidth=li->colsPerBlock;
 		dim=blockWidth*blockHeight;
@@ -235,9 +236,12 @@ void OpenFileHelper(char* fileName)
 			li->curr=li->curr->next;
 		}
 	}
-	else
+	else{
 		printf("Error: File cannot be opened\n");
+		ret= 0;
+	}
 	LFLDestructor(li);
+	return ret;
 }
 
 /*
@@ -439,13 +443,15 @@ switch(inpCommand->commands){
 
 	case SOLVE_COMMAND:
 		gameMode=SOLVE;
-		OpenFileHelper(inpCommand->fileName);
+		if(OpenFileHelper(inpCommand->fileName)!=1)
+			gameMode=INIT;
 		break;
 
 	case EDIT_COMMAND:
 		gameMode=EDIT;
 		markErrors=1;
-		OpenFileHelper(inpCommand->fileName);
+		if(OpenFileHelper(inpCommand->fileName)!=1)
+			gameMode=INIT;
 		break;
 
 	case RESET_COMMAND: /*ALMOST DONE*/
@@ -510,7 +516,10 @@ switch(inpCommand->commands){
 		break;
 
 	case PRINTBOARD_COMMAND: /*DONE*/
-		printBoard(board, fixed, gameMode, markErrors, blockHeight, blockWidth, dim);
+		if(gameMode!=INIT)
+			printBoard(board, fixed, gameMode, markErrors, blockHeight, blockWidth, dim);
+		else
+			printf("ERROR: invalid command\n");
 		break;
 
 	case SET_COMMAND: /*ALMOST DONE*/

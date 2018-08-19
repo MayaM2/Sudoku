@@ -44,6 +44,8 @@ void ParseCommand(Command *currCommand){
 	userInp[2]=NULL;
 	userInp[3]=NULL;
 
+	free(currCommand->fileName);
+	currCommand->fileName=(char*)calloc(256,sizeof(char));
 
 	/*Don't want to catch game prints...*/
 	setvbuf(stdin,NULL,_IONBF,0);
@@ -73,12 +75,18 @@ void ParseCommand(Command *currCommand){
 	/* create the result command struct according to input */
 	if(strcmp(userInp[0],"solve")==0){
 		currCommand->commands=SOLVE_COMMAND;
-		currCommand->fileName=strcpy(currCommand->fileName,userInp[1]);
+		if(userInp[1]!=NULL)
+			currCommand->fileName=strcpy(currCommand->fileName,userInp[1]);
+		else
+			currCommand->commands=INVALID_COMMAND;
 	}
 
 	else if(strcmp(userInp[0],"edit")==0){
 		currCommand->commands=EDIT_COMMAND;
-		currCommand->fileName=strcpy(currCommand->fileName,userInp[1]);
+		if(userInp[1]!=NULL)
+			currCommand->fileName=strcpy(currCommand->fileName,userInp[1]);
+		else
+			currCommand->fileName=NULL;
 	}
 	/*in case numeric values are expeced - check if they are numeric,
 	 * else - validity argument will be set to invalid input */
@@ -129,7 +137,10 @@ void ParseCommand(Command *currCommand){
 
 	else if(strcmp(userInp[0],"save")==0){
 		currCommand->commands=SAVE_COMMAND;
-		currCommand->fileName=strcpy(currCommand->fileName,userInp[1]);
+		if(userInp[1]!=NULL)
+			currCommand->fileName=strcpy(currCommand->fileName,userInp[1]);
+		else
+			currCommand->commands=INVALID_COMMAND;
 	}
 	else if(strcmp(userInp[0],"hint")==0){
 		currCommand->commands=HINT_COMMAND;

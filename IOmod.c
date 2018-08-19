@@ -18,6 +18,7 @@ int openFile(LoadFileList* li, char* fileName, int isSolve)
 		if(isSolve==0){
 			li->colsPerBlock=3;
 			li->rowsPerBlock=3;
+			return 1;
 		}
 		else
 			return 0;
@@ -67,7 +68,7 @@ int saveFile(int** board, int** fixed, char* fileName, int gameMode, int blockHe
 		for(j=0;j<dim;j++)
 		{
 			fprintf(fp,"%d",board[i][j]);
-			if(gameMode==EDIT || fixed[i][j]==1)
+			if((gameMode==EDIT && board[i][j]!=0) || fixed[i][j]==1)
 				fprintf(fp,".");
 			if(j<dim-1)
 				fprintf(fp," ");
