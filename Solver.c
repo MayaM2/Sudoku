@@ -295,7 +295,7 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 	int i=0, j=0, k=0, ii=0,jj=0,count=0;
 
 	/*Create environment*/
-	error = GRBloadenv(&env,"sudoku.log");
+	error = GRBloadenv(&env,NULL);
 	/*here no log file will be written since an empty string was given.*/
 	if (error || env == NULL){
 		goto QUIT;
@@ -416,8 +416,8 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 	}
 
 	/*write model to sudoku.lp */
-	error = GRBwrite(model,"sudoku.lp");
-	if(error) goto QUIT;
+	/*error = GRBwrite(model,"sudoku.lp");
+	if(error) goto QUIT;*/
 
 
 	/*Capture solution information*/
