@@ -144,12 +144,12 @@ int isBoardEmpty(){
 
 /* returns 1 if validation passed, 0 otherwise*/
 /* will print to user only if int printMessages == 1*/
-int validate(int** board,int blockHeight, int blockWidth, int dim, int printMessage)
+int validate(int printMessage)
 {
 	if(gameMode == SOLVE || gameMode==EDIT){
 		int passed = 0;
 		if(isBoardErroneous()){
-			if(!allFilled()){ /* only print if board is not all filled */
+			if(!allFilled() && printMessage ==1){ /* only print if board is not all filled */
 				printf("Error: board contains erroneous values\n");
 			}
 			return 0;
@@ -174,8 +174,6 @@ int validate(int** board,int blockHeight, int blockWidth, int dim, int printMess
 		return 0;
 	}
 }
-
-
 
 /*
  * "Hidden" functions- Freer frees old memory, Creator calls freer and creates new.
@@ -491,7 +489,7 @@ switch(inpCommand->commands){
 					printf("Error: board contains erroneous values\n");
 				else
 				{
-					if(gameMode==EDIT && validate(board, blockHeight,blockWidth, dim, 0)!=1)
+					if(gameMode==EDIT && validate(0)!=1)
 						printf("Error: board validation failed\n");
 					else
 					{
@@ -543,7 +541,7 @@ switch(inpCommand->commands){
 					printBoard();
 					if(allFilled()){ /* call allFilled to check if all board cells are filled */
 
-						if(validate(board, blockHeight,blockWidth, dim, 0)==1){ /*validate board*/
+						if(validate(0)==1){ /*validate board*/
 							printf("Puzzle solved successfully\n"); /* case board is filled and valid - end of game */
 							gameMode=INIT;
 						}
@@ -562,7 +560,7 @@ switch(inpCommand->commands){
 		break;
 
 	case VALIDATE_COMMAND: /*DONE*/
-		validate(board,blockHeight,blockWidth,dim,1);
+		validate(1);
 		break;
 
 	case GENERATE_COMMAND:
@@ -714,7 +712,7 @@ switch(inpCommand->commands){
 			else{
 				Autofill(board, undoRedo, blockHeight, blockWidth);
 				printBoard();
-				if(allFilled() && validate(board, blockHeight,blockWidth, dim, 0)==1){ /*validate board*/
+				if(allFilled() && validate(0)==1){ /*validate board*/
 					printf("Puzzle solved successfully\n"); /* case board is filled and valid - end of game */
 					gameMode=INIT;
 				}
