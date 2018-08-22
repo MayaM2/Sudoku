@@ -147,11 +147,12 @@ int validate(int** board,int blockHeight, int blockWidth, int dim, int printMess
  */
 int allfilled(int** board, int dim){
 	int i=0,j=0;
-	for (; i < dim; i++){
-	  for (; j < dim; j++){
-		  if(board[i][j] ==0)
-			  return 0;
-	  }
+	for(i=0;i<dim;i++){
+		for(j=0;j<dim;j++){
+			if(board[i][j]==0){
+				return 0;
+			}
+		}
 	}
 	return 1;
 }
@@ -536,7 +537,7 @@ switch(inpCommand->commands){
 					board[(inpCommand->arg1)-1][(inpCommand->arg2)-1]=inpCommand->arg3;
 					/* board print may be executed by main... */
 					printBoard();
-					if(allfilled(board,dim)==1){ /* call allfilled to check if all board cells are filled */
+					if(allfilled(board,dim)){ /* call allfilled to check if all board cells are filled */
 
 						if(validate(board, blockHeight,blockWidth, dim, 0)==1){ /*validate board*/
 							printf("Puzzle solved successfully\n"); /* case board is filled and valid - end of game */
