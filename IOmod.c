@@ -7,6 +7,7 @@ int openFile(LoadFileList* li, char* fileName, int isSolve)
 {
 	FILE* fp;
 	int m,n,curr,i=0,j=0, isFixed=0;
+	char c;
 	setvbuf(stdout,NULL,_IONBF,0);
 	setvbuf(stderr,NULL,_IONBF,0);
 	setvbuf(stdin,NULL,_IONBF,0);
@@ -29,8 +30,16 @@ int openFile(LoadFileList* li, char* fileName, int isSolve)
 		if(fp==NULL)
 			return 0;
 		/* read m and n, create board accordingly*/
-		fscanf(fp,"%d",&m);
-		fscanf(fp,"%d",&n);
+		if(fscanf(fp,"%d",&m)!=1)
+		{
+			printErrorMessage("fscanf");
+			return FATAL_ERROR;
+		}
+		if(fscanf(fp,"%d",&n)!=1)
+		{
+			printErrorMessage("fscanf");
+			return FATAL_ERROR;
+		}
 		li->colsPerBlock=m;
 		li->rowsPerBlock=n;
 		for(i=0;i<m*n;i++)
@@ -38,11 +47,30 @@ int openFile(LoadFileList* li, char* fileName, int isSolve)
 			for(j=0;j<m*n;j++)
 			{
 				isFixed=0;
-				fscanf(fp,"%2d",&curr);
-				if(fgetc(fp)=='.')
+				if(fscanf(fp,"%2d",&curr)!=1)
+				{
+					printErrorMessage("fscanf");
+					return FATAL_ERROR;
+				}
+				c=fgetc(fp);
+				if(c=='.')
 					isFixed=1;
 				else
-					fseek(fp,-1,SEEK_CUR);
+				{
+					if(c==EOF)
+					{
+						printErrorMessage("fgetc");
+						return FATAL_ERROR;
+					}
+					else
+					{
+						if(fseek(fp,-1,SEEK_CUR)!=0)
+						{
+							printErrorMessage("fseek");
+							return FATAL_ERROR;
+						}
+					}
+				}
 				LFLAppend(li,i,j,curr,isFixed);
 				if(isFixed==1)
 					fseek(fp,1,SEEK_CUR);

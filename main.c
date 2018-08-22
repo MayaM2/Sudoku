@@ -21,7 +21,8 @@ int main()
 	while(currCommand->commands!=EXIT_COMMAND)
 	{
 		ParseCommand(currCommand);
-		doCommand(currCommand);
+		if(doCommand(currCommand)==FATAL_ERROR)
+			return 0;
 	}
 
 	commandDestructor(currCommand); /*free memory of current (and only) command*/

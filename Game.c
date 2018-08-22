@@ -220,9 +220,10 @@ void MainMemoryCreator()
 int OpenFileHelper(char* fileName)
 {
 	LoadFileList *li;
-	int ret=1;
+	int ret=1, ofres=0;
 	li=LFLCreator();
-	if(openFile(li,fileName,gameMode==SOLVE?1:0)==1)
+	ofres=openFile(li,fileName,gameMode==SOLVE?1:0);
+	if(ofres==1)
 	{
 		MainMemoryFreer();
 		blockHeight=li->rowsPerBlock;
@@ -238,8 +239,14 @@ int OpenFileHelper(char* fileName)
 		}
 	}
 	else{
-		printf("Error: File cannot be opened\n");
-		ret= 0;
+		if(ofres==0)
+		{
+			printf("Error: File cannot be opened\n");
+			ret= 0;
+		}
+		/*FATAL ERROR*/
+		else if (ofres==FATAL_ERROR)
+			return FATAL_ERROR;
 	}
 	LFLDestructor(li);
 	return ret;
@@ -438,21 +445,33 @@ int generate(int X, int Y){
 /*
  *doCommand - checks type of command using switch case. Checks validity and prints error message if needed, else - calls corresponding function.
  */
-void doCommand(Command* inpCommand){
-	int i=0,j=0, sols=0;
+int doCommand(Command* inpCommand){
+	int i=0,j=0, sols=0,res=0,ret=0;
 switch(inpCommand->commands){
 
 	case SOLVE_COMMAND:
 		gameMode=SOLVE;
-		if(OpenFileHelper(inpCommand->fileName)!=1)
-			gameMode=INIT;
+		res=OpenFileHelper(inpCommand->fileName);
+		if(res!=1)
+		{
+			if(res==0)
+				gameMode=INIT;
+			else if(res==FATAL_ERROR)
+				ret=FATAL_ERROR;
+		}
 		break;
 
 	case EDIT_COMMAND:
 		gameMode=EDIT;
 		markErrors=1;
-		if(OpenFileHelper(inpCommand->fileName)!=1)
-			gameMode=INIT;
+		res=OpenFileHelper(inpCommand->fileName);
+		if(res!=1)
+		{
+			if(res==0)
+				gameMode=INIT;
+			else if(res==FATAL_ERROR)
+				ret=FATAL_ERROR;
+		}
 		break;
 
 	case RESET_COMMAND: /*ALMOST DONE*/
@@ -584,7 +603,7 @@ switch(inpCommand->commands){
 			}	/* end of numbers in range*/
 			else{ /* numbers are not in range*/
 				printf("Error: value not in range 0-%d\n",dim*dim);
-				return;
+				return 0;
 			}
 		}
 		else{/* not in edit or solve mode */
@@ -650,29 +669,29 @@ switch(inpCommand->commands){
 			 /* checks if any integers were given as X Y Z */
 				if(!((inpCommand->validity==1)&&(numInRange(inpCommand->arg1,1,dim)&&numInRange(inpCommand->arg2,1,dim)))){ /* checks if X Y Z are integers in range 1-N, N=dim*/
 					printf("Error: value not in range 0-%d\n",dim);
-					return;
+					return 0;
 				} /* end of numbers not in range*/
 				if(isBoardErroneous()){ /* case board is erroneous - don't execute*/
 					printf("Error: board contains erroneous values\n");
-					return;
+					return 0;
 				}
 				if(fixed[inpCommand->arg1-1][inpCommand->arg2-1]==1){  /* case cell is fixed - don't execute*/
 					printf("Error: cell is fixed\n");
-					return;
+					return 0;
 
 				}
 				if(board[inpCommand->arg1-1][inpCommand->arg2-1]!=0){ /* case cell is not empty - don't execute*/
 					printf("Error: cell already contains a value\n");
-					return;
+					return 0;
 				}
 				i=ILPSolver(board,fixed,solvedBoard,blockHeight,blockWidth,dim);
 				if(!i){
 					printf("Error: board is unsolvable\n");
-					return;
+					return 0;
 				}
 				else{
 					printf("Hint: set cell to %d\n",solvedBoard[inpCommand->arg1-1][inpCommand->arg2-1]);
-					return;
+					return 0;
 				}
 			}
 		else{/* not in edit or solve mode */
@@ -728,5 +747,6 @@ switch(inpCommand->commands){
 	default :
 		break;
 }
+return ret;
 }
 

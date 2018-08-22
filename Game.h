@@ -21,5 +21,5 @@ void printsForRedoUndo(int isUndo, int row, int col, int num1, int num2);
 int problemCellAssignment(int i, int j);
 int randomFill(int X,int *arri,int *arrj);
 int generate(int X, int Y, int dim);
-void doCommand(Command* inpCommand);
+int doCommand(Command* inpCommand);
 #endif /* GAME_H_ */
