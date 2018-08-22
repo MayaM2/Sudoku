@@ -129,7 +129,7 @@ int allFilled(){
 /*
  * Returns 1 if board is empty, 0 otherwise
  */
-int isBoardEmpty(int** board, int dim){
+int isBoardEmpty(){
 	int i=0,j=0;
 	for(i=0;i<dim;i++){
 		for(j=0;j<dim;j++){
@@ -567,7 +567,7 @@ switch(inpCommand->commands){
 
 	case GENERATE_COMMAND:
 		if(gameMode == EDIT){
-			if(!isBoardEmpty(board,dim)){
+			if(!isBoardEmpty()){
 				printf("Error: board is not empty\n");
 				break;
 			}
