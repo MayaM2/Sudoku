@@ -110,42 +110,11 @@ int numInRange(int num, int lower, int upper){
 	return 0;
 }
 
-/* returns 1 if validation passed, 0 otherwise*/
-/* will print to user only if int printMessages == 1*/
-int validate(int** board,int blockHeight, int blockWidth, int dim, int printMessage)
-{
-	if(gameMode == SOLVE || gameMode==EDIT){
-		int passed = 0;
-		if(isBoardErroneous()){
-			printf("Error: board contains erroneous values\n");
-			return 0;
-		}
-		passed = ILPSolver(board,fixed,solvedBoard,blockHeight,blockWidth,dim);
-		if(passed==1){
-			if(printMessage){
-				printf("Validation passed: board is solvable\n");
-			}
-			return 1;
-		}
-		else{
-			if(printMessage){
-				printf("Validation failed: board is not solvable\n");
-			}
-			return 0;
-		}
-
-	}
-	else{
-		printf("ERROR: invalid command\n");
-		return 0;
-	}
-}
-
 /*
  * goes over all cells in board. returns 1 if all cells are filled,
  * 0 otherwise.
  */
-int allfilled(int** board, int dim){
+int allFilled(){
 	int i=0,j=0;
 	for(i=0;i<dim;i++){
 		for(j=0;j<dim;j++){
@@ -171,6 +140,41 @@ int isBoardEmpty(int** board, int dim){
 	}
 	return 1;
 }
+
+
+/* returns 1 if validation passed, 0 otherwise*/
+/* will print to user only if int printMessages == 1*/
+int validate(int** board,int blockHeight, int blockWidth, int dim, int printMessage)
+{
+	if(gameMode == SOLVE || gameMode==EDIT){
+		int passed = 0;
+		if(isBoardErroneous()){
+			if(!allFilled()){ /* only print if board is not all filled */
+				printf("Error: board contains erroneous values\n");
+			}
+			return 0;
+		}
+		passed = ILPSolver(board,fixed,solvedBoard,blockHeight,blockWidth,dim);
+		if(passed==1){
+			if(printMessage){
+				printf("Validation passed: board is solvable\n");
+			}
+			return 1;
+		}
+		else{
+			if(printMessage){
+				printf("Validation failed: board is not solvable\n");
+			}
+			return 0;
+		}
+
+	}
+	else{
+		printf("ERROR: invalid command\n");
+		return 0;
+	}
+}
+
 
 
 /*
@@ -537,7 +541,7 @@ switch(inpCommand->commands){
 					board[(inpCommand->arg1)-1][(inpCommand->arg2)-1]=inpCommand->arg3;
 					/* board print may be executed by main... */
 					printBoard();
-					if(allfilled(board,dim)){ /* call allfilled to check if all board cells are filled */
+					if(allFilled()){ /* call allFilled to check if all board cells are filled */
 
 						if(validate(board, blockHeight,blockWidth, dim, 0)==1){ /*validate board*/
 							printf("Puzzle solved successfully\n"); /* case board is filled and valid - end of game */
@@ -710,7 +714,7 @@ switch(inpCommand->commands){
 			else{
 				Autofill(board, undoRedo, blockHeight, blockWidth);
 				printBoard();
-				if(validate(board, blockHeight,blockWidth, dim, 0)==1){ /*validate board*/
+				if(allFilled() && validate(board, blockHeight,blockWidth, dim, 0)==1){ /*validate board*/
 					printf("Puzzle solved successfully\n"); /* case board is filled and valid - end of game */
 					gameMode=INIT;
 				}
