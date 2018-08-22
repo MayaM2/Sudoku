@@ -97,8 +97,6 @@ void printBoard()
 	printf("\n");
 }
 
-
-
 /*
  * returns 1 if a given num is between lower and upper given numbers inclusively.
  * 0 therwise.
@@ -142,8 +140,8 @@ int isBoardEmpty(){
 }
 
 
-/* returns 1 if validation passed, 0 otherwise*/
-/* will print to user only if int printMessages == 1*/
+/* returns 1 if validation passed, 0 otherwise
+ * will print to user only if int printMessages == 1*/
 int validate(int printMessage)
 {
 	if(gameMode == SOLVE || gameMode==EDIT){
