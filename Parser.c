@@ -37,8 +37,8 @@ int IsInteger(const char* s)
  */
 void ParseCommand(Command *currCommand){
 	char readFromUser[256];
-	char* userInp[4]/*,c='a'*/;
-	/*int i=0;*/
+	char* userInp[4],c='a';
+	int i=0;
 
 	userInp[0]=NULL;
 	userInp[1]=NULL;
@@ -50,12 +50,23 @@ void ParseCommand(Command *currCommand){
 
 	/*Don't want to catch game prints...*/
 	setvbuf(stdin,NULL,_IONBF,0);
+	setvbuf(stdout,NULL,_IONBF,0);
 
 	printf("Enter your command:\n");
 
 	/* read input from user. if fgets is null, we have reached EOF */
 	if(fgets(readFromUser, 256, stdin)==NULL){
 		currCommand->commands=EXIT_COMMAND;
+		return;
+	}
+
+	for(i=0;i<256 && c!='\n' && c!=EOF;i++)
+		c=readFromUser[i];
+	/*clear stdin. this also means that command is invalid!*/
+	if(i==256)
+	{
+		currCommand->commands=INVALID_COMMAND;
+		while((c=getchar())!='\n' && c!=EOF);
 		return;
 	}
 
@@ -176,15 +187,5 @@ void ParseCommand(Command *currCommand){
 	}
 	if(currCommand->validity==0)
 		currCommand->commands=INVALID_COMMAND;
-/*
-	for(i=0;i<256 && c!='\n' && c!=EOF;i++)
-		c=readFromUser[i];*/
-	/*clear stdin. this also means that command is invalid!*/
-	/*
-	if(i==256)
-	{
-		currCommand->commands=INVALID_COMMAND;
-		while((c=getchar())!='\n' && c!=EOF);
-	}*/
 }
 

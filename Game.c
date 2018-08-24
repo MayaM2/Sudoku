@@ -64,7 +64,6 @@ int isBoardErroneous()
 void printBoard()
 {
 	int i=0,j=0;
-	setvbuf(stdout,NULL,_IONBF,0);
 	for(;i<dim;i++){
 		if(i%blockHeight==0){
 			for(j=0;j<4*dim+blockWidth+1;j++)
@@ -448,6 +447,8 @@ int generate(int X, int Y){
  */
 int doCommand(Command* inpCommand){
 	int i=0,j=0, sols=0,res=0,ret=0;
+	setvbuf(stdin,NULL,_IONBF,0);
+	setvbuf(stdout,NULL,_IONBF,0);
 switch(inpCommand->commands){
 
 	case SOLVE_COMMAND:
@@ -714,9 +715,10 @@ switch(inpCommand->commands){
 			else
 			{
 				sols=numSols(board,blockHeight,blockWidth);
+
+				printf("Number of solutions: %d\n",sols);
 				if(sols!=0)
 				{
-					printf("Number of solutions: %d\n",sols);
 					if(sols==1)
 						printf("This is a good board!\n");
 					else
