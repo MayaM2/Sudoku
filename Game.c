@@ -599,7 +599,7 @@ switch(inpCommand->commands){
 					printf("Error: puzzle generator failed\n");
 				}
 				else{/*puzzle generation successful*/
-					printBoard(board);
+					printBoard();
 				}
 			}	/* end of numbers in range*/
 			else{ /* numbers are not in range*/
