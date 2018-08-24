@@ -103,7 +103,6 @@ void ParseCommand(Command *currCommand){
 
 	}
 	else if(strcmp(userInp[0],"print_board")==0){
-		/*DEBUGGING */ printf("PRINTBOARD_COMMAND in parser\n");
 		currCommand->commands=PRINTBOARD_COMMAND;
 	}
 	else if(strcmp(userInp[0],"set")==0){
