@@ -395,7 +395,7 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 	/*Add fixed-cell constraints*/
 	for(i=0;i<dim;i++){
 		for(j=0;j<dim;j++){
-			if(fixed[i][j]==1){ /* if certain cell is set to be fixed*/
+			if(board[i][j]!=0){ /* if certain cell is set to be fixed*/
 				k=board[i][j];
 				ind[0]=i*dim*dim+j*dim+k-1;
 				val[0]=1.0; /*coeff of constraint is 1*/
