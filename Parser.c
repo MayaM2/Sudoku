@@ -176,14 +176,15 @@ void ParseCommand(Command *currCommand){
 	}
 	if(currCommand->validity==0)
 		currCommand->commands=INVALID_COMMAND;
-
+/*
 	for(i=0;i<256 && c!='\n' && c!=EOF;i++)
-		c=readFromUser[i];
+		c=readFromUser[i];*/
 	/*clear stdin. this also means that command is invalid!*/
+	/*
 	if(i==256)
 	{
 		currCommand->commands=INVALID_COMMAND;
 		while((c=getchar())!='\n' && c!=EOF);
-	}
+	}*/
 }
 
