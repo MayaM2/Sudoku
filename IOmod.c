@@ -55,7 +55,7 @@ int openFile(LoadFileList* li, char* fileName, int isSolve)
 				c=fgetc(fp);
 				if(c=='.')
 					isFixed=1;
-				else
+				/*else
 				{
 					if(c==EOF)
 					{
@@ -70,7 +70,7 @@ int openFile(LoadFileList* li, char* fileName, int isSolve)
 							return FATAL_ERROR;
 						}
 					}
-				}
+				}*/
 				LFLAppend(li,i,j,curr,isFixed);
 				if(isFixed==1)
 					fseek(fp,1,SEEK_CUR);

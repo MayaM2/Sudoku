@@ -538,7 +538,7 @@ switch(inpCommand->commands){
 
 	case PRINTBOARD_COMMAND: /*DONE*/
 		if(gameMode!=INIT)
-			printBoard(board, fixed, gameMode, markErrors, blockHeight, blockWidth, dim);
+			printBoard();
 		else
 			printf("ERROR: invalid command\n");
 		break;
