@@ -64,6 +64,7 @@ int isBoardErroneous()
 void printBoard()
 {
 	int i=0,j=0;
+	setvbuf(stdout,NULL,_IONBF,0);
 	for(;i<dim;i++){
 		if(i%blockHeight==0){
 			for(j=0;j<4*dim+blockWidth+1;j++)
@@ -709,11 +710,14 @@ switch(inpCommand->commands){
 			else
 			{
 				sols=numSols(board,blockHeight,blockWidth);
-				printf("Number of solutions: %d\n",sols);
-				if(sols==1)
-					printf("This is a good board!\n");
-				else
-					printf("The puzzle has more than 1 solution, try to edit it further\n");
+				if(sols!=0)
+				{
+					printf("Number of solutions: %d\n",sols);
+					if(sols==1)
+						printf("This is a good board!\n");
+					else
+						printf("The puzzle has more than 1 solution, try to edit it further\n");
+				}
 			}
 
 		}
