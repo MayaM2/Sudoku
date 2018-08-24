@@ -37,7 +37,7 @@ int IsInteger(const char* s)
  */
 void ParseCommand(Command *currCommand){
 	char readFromUser[256];
-	char* userInp[4],c='a';
+	char* userInp[4]/*,c='a'*/;
 	int i=0;
 
 	userInp[0]=NULL;
