@@ -537,8 +537,11 @@ switch(inpCommand->commands){
 		break;
 
 	case PRINTBOARD_COMMAND: /*DONE*/
-		if(gameMode!=INIT)
+		/*DEBUGGING */ printf("PRINTBOARD_COMMAND in docommand\n");
+		if(gameMode!=INIT){
+			/*DEBUGGING */ printf("call to Printboard\n");
 			printBoard();
+		}
 		else
 			printf("ERROR: invalid command\n");
 		break;
@@ -704,12 +707,15 @@ switch(inpCommand->commands){
 		if(gameMode==INIT)
 			printf("ERROR: invalid command\n");
 		else
+			/*DEBUGGING */ printf("game mode is not init\n");
 		{
 			if(isBoardErroneous()==1)
 				printf("Error: board contains erroneous values\n");
 			else
 			{
+				/*DEBUGGING */ printf("board is not erroneous\n");
 				sols=numSols(board,blockHeight,blockWidth);
+				/*DEBUGGING */ printf("num sols is %d \n", sols);
 				if(sols!=0)
 				{
 					printf("Number of solutions: %d\n",sols);
