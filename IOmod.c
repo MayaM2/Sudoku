@@ -7,6 +7,7 @@ int openFile(LoadFileList* li, char* fileName, int isSolve)
 {
 	FILE* fp;
 	int m,n,curr,i=0,j=0, isFixed=0;
+	long int endPos=0;
 	char c;
 	setvbuf(stdout,NULL,_IONBF,0);
 	setvbuf(stderr,NULL,_IONBF,0);
@@ -29,6 +30,10 @@ int openFile(LoadFileList* li, char* fileName, int isSolve)
 		fp=fopen(fileName,"r");
 		if(fp==NULL)
 			return 0;
+
+		fseek(fp,0,SEEK_END);
+		endPos=ftell(fp);
+		fseek(fp,0,SEEK_SET);
 		/* read m and n, create board accordingly*/
 		if(fscanf(fp,"%d",&m)!=1)
 		{
@@ -52,25 +57,28 @@ int openFile(LoadFileList* li, char* fileName, int isSolve)
 					printErrorMessage("fscanf");
 					return FATAL_ERROR;
 				}
-				c=fgetc(fp);
-				if(c=='.')
-					isFixed=1;
-				/*else
+				if(ftell(fp)!=endPos)
 				{
-					if(c==EOF)
-					{
-						printErrorMessage("fgetc");
-						return FATAL_ERROR;
-					}
+					c=fgetc(fp);
+					if(c=='.')
+						isFixed=1;
 					else
 					{
-						if(fseek(fp,-1,SEEK_CUR)!=0)
+						if(c==EOF)
 						{
-							printErrorMessage("fseek");
+							printErrorMessage("fgetc");
 							return FATAL_ERROR;
 						}
+						else
+						{
+							if(fseek(fp,-1,SEEK_CUR)!=0)
+							{
+								printErrorMessage("fseek");
+								return FATAL_ERROR;
+							}
+						}
 					}
-				}*/
+				}
 				LFLAppend(li,i,j,curr,isFixed);
 				if(isFixed==1)
 					fseek(fp,1,SEEK_CUR);
