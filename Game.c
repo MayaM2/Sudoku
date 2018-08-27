@@ -206,7 +206,7 @@ void MainMemoryCreator()
 	board=(int**)calloc(dim,sizeof(int*));
 	fixed=(int**)calloc(dim,sizeof(int*));
 	solvedBoard=(int**)calloc(dim,sizeof(int*));
-	undoRedo=undoRedoCreator();
+	undoRedo=undoRedoCreator(dim);
 	for(i=0;i<dim;i++){
 		board[i]=(int*)calloc(dim,sizeof(int));
 		fixed[i]=(int*)calloc(dim,sizeof(int));
@@ -237,6 +237,7 @@ int OpenFileHelper(char* fileName)
 			fixed[li->curr->row][li->curr->col]=li->curr->isFixed;
 			li->curr=li->curr->next;
 		}
+		undoRedoAppend(undoRedo,board);
 	}
 	else{
 		if(ofres==0)
@@ -447,6 +448,7 @@ int generate(int X, int Y){
  */
 int doCommand(Command* inpCommand){
 	int i=0,j=0, sols=0,res=0,ret=0;
+	UndoRedoList *dummy;
 	setvbuf(stdin,NULL,_IONBF,0);
 	setvbuf(stdout,NULL,_IONBF,0);
 switch(inpCommand->commands){
@@ -478,13 +480,25 @@ switch(inpCommand->commands){
 
 	case RESET_COMMAND: /*ALMOST DONE*/
 		if(gameMode==SOLVE || gameMode==EDIT){
+			undoRedo->curr=undoRedo->head;
+			if(undoRedo->head->next!=NULL)
+			{
+				dummy=undoRedoCreator(dim);
+				dummy->head=undoRedo->head->next;
+				undoRedo->head->next=NULL;
+				dummy->head->prev=NULL;
+				undoRedoDestroyer(dummy);
+			}
+			for(i=0;i<dim;i++)
+				for(j=0;j<dim;j++)
+					board[i][j]=undoRedo->head->nodeBoard[i][j];
 			/*while node is NOT dummy, move backwards*/
-			while(undoRedo->curr->row!=-1){
+			/*while(undoRedo->curr->row!=-1){
 				board[undoRedo->curr->row][undoRedo->curr->col]=undoRedo->curr->oldVal;
 				undoRedo->curr=undoRedo->curr->prev;
 			}
 			undoRedoDestroyer(undoRedo);
-			undoRedo=undoRedoCreator();
+			undoRedo=undoRedoCreator();*/
 			printf("Board reset\n");
 			printBoard();
 		}
@@ -556,9 +570,10 @@ switch(inpCommand->commands){
 						break;
 					}
 					/* in this case, we can set the board! */
-					undoRedoAppend(undoRedo,(inpCommand->arg1)-1,(inpCommand->arg2)-1,
-							board[(inpCommand->arg1)-1][(inpCommand->arg2)-1],inpCommand->arg3,0,0);
+					/*undoRedoAppend(undoRedo,(inpCommand->arg1)-1,(inpCommand->arg2)-1,
+							board[(inpCommand->arg1)-1][(inpCommand->arg2)-1],inpCommand->arg3,0,0);*/
 					board[(inpCommand->arg1)-1][(inpCommand->arg2)-1]=inpCommand->arg3;
+					undoRedoAppend(undoRedo,board);
 					/* board print may be executed by main... */
 					printBoard();
 					if(allFilled()){ /* call allFilled to check if all board cells are filled */
@@ -622,10 +637,21 @@ switch(inpCommand->commands){
 		else
 		{
 			/*if dummy node at head, nothing to undo*/
-			if(undoRedo->curr->row==-1)
+			if(undoRedo->curr->prev==NULL)
 				printf("Error: no moves to undo\n");
 			else
 			{
+				undoRedo->curr=undoRedo->curr->prev;
+				for(i=0;i<dim;i++)
+					for(j=0;j<dim;j++)
+						if(undoRedo->curr->nodeBoard[i][j]!=undoRedo->curr->next->nodeBoard[i][j])
+						{
+							board[i][j]=undoRedo->curr->nodeBoard[i][j];
+							printsForRedoUndo(1,i+1,j+1,
+									undoRedo->curr->next->nodeBoard[i][j],
+									undoRedo->curr->nodeBoard[i][j]);
+						}
+				/*
 				while(i==0){
 					i++;
 					board[undoRedo->curr->row][undoRedo->curr->col]=undoRedo->curr->oldVal;
@@ -638,6 +664,7 @@ switch(inpCommand->commands){
 					if(undoRedo->curr->isAutofilled==1 && undoRedo->curr->next->isAutofilled==1 && undoRedo->curr->next->isAutofillStarter==0)
 						i--;
 				}
+				*/
 			}
 		}
 		break;
@@ -651,6 +678,17 @@ switch(inpCommand->commands){
 				printf("Error: no moves to redo\n");
 			else
 			{
+				undoRedo->curr=undoRedo->curr->next;
+				for(i=0;i<dim;i++)
+					for(j=0;j<dim;j++)
+						if(undoRedo->curr->nodeBoard[i][j]!=undoRedo->curr->prev->nodeBoard[i][j])
+						{
+							board[i][j]=undoRedo->curr->nodeBoard[i][j];
+							printsForRedoUndo(0,i+1,j+1,
+									undoRedo->curr->prev->nodeBoard[i][j],
+									undoRedo->curr->nodeBoard[i][j]);
+						}
+				/*
 				while(i==0){
 					i++;
 					undoRedo->curr=undoRedo->curr->next;
@@ -665,6 +703,7 @@ switch(inpCommand->commands){
 				}
 				if(undoRedo->curr==NULL)
 					undoRedo->curr=undoRedo->tail;
+				*/
 			}
 		}
 		break;
@@ -737,7 +776,8 @@ switch(inpCommand->commands){
 			if(isBoardErroneous()==1)
 				printf("Error: board contains erroneous values\n");
 			else{
-				Autofill(board, undoRedo, blockHeight, blockWidth);
+				if(Autofill(board, blockHeight, blockWidth)==1)
+					undoRedoAppend(undoRedo,board);
 				printBoard();
 				if(allFilled() && validate(0)==1){ /*validate board*/
 					printf("Puzzle solved successfully\n"); /* case board is filled and valid - end of game */

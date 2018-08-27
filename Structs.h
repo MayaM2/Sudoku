@@ -51,24 +51,26 @@ void LFLAppend(LoadFileList *li, int row, int col, int val, int isFixed);
 typedef struct urNode{
 	struct urNode* prev;
 	struct urNode* next;
-	int row;
+	int** nodeBoard;
+	/*int row;
 	int col;
 	int oldVal;
 	int newVal;
 	int isAutofilled;
-	int isAutofillStarter;
+	int isAutofillStarter;*/
 } UndoRedoNode;
 
 typedef struct urList{
 	UndoRedoNode* head;
 	UndoRedoNode* tail;
 	UndoRedoNode* curr;
+	int dim;
 } UndoRedoList;
 
 /*
  * Constructor
  */
-UndoRedoList* undoRedoCreator();
+UndoRedoList* undoRedoCreator(int dim);
 /*
  * Destructor
  */
@@ -76,7 +78,7 @@ void undoRedoDestroyer(UndoRedoList* li);
 /*
  * create and append new node to undoredo list. if there are nodes following current node, remove them before appending.
  */
-void undoRedoAppend(UndoRedoList* li,int row, int col, int oldVal, int newVal, int isAutofilled, int isStarter);
+void undoRedoAppend(UndoRedoList* li, int** board);
 
 
 /*
@@ -120,7 +122,7 @@ RecStackNode* recStackNodeCreator(int row, int col, int isForward, int* bin, int
 RecStackNode* recStackPop(RecStack* r);
 
 
-void destroyNode(UndoRedoNode* n);
+void destroyNode(UndoRedoNode* n, int dim);
 void LFLNodeDelete(LoadFileNode *n);
 
 

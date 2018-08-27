@@ -77,7 +77,31 @@ int isObv(int** board, int row, int col,int blockHeight, int blockWidth, int* ne
 	return 0;
 }
 
-void Autofill(int** board, UndoRedoList *urli, int blockHeight, int blockWidth)
+int Autofill(int** board, int blockHeight, int blockWidth)
+{
+	int i=0,j=0, val=0, appended=0, dim=blockHeight*blockWidth, *neighborsBin;
+	neighborsBin=(int*)calloc(dim,sizeof(int));
+	for(i=0;i<dim;i++)
+	{
+		for(j=0;j<dim;j++)
+		{
+			if(board[i][j]==0)
+			{
+				val=isObv(board,i,j,blockHeight,blockWidth,neighborsBin);
+				if(val!=0){
+					appended=1;
+					board[i][j]=val;
+					printf("Cell <%d,%d> set to %d\n",i+1,j+1,val);
+				}
+			}
+		}
+	}
+	free(neighborsBin);
+	return appended;
+}
+
+/*
+void Autofill_OLD(int** board, UndoRedoList *urli, int blockHeight, int blockWidth)
 {
 	int i=0,j=0, val=0, appended=0, dim=blockHeight*blockWidth, *neighborsBin;
 	neighborsBin=(int*)calloc(dim,sizeof(int));
@@ -113,6 +137,7 @@ void Autofill(int** board, UndoRedoList *urli, int blockHeight, int blockWidth)
 	}
 	free(neighborsBin);
 }
+*/
 
 /*
  * "Hidden" func- return next cell in board, according to direction. -1 -1 denotes trying to leave last cell,

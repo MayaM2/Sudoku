@@ -36,7 +36,7 @@ int IsInteger(const char* s)
  * a corresponding command struct.
  */
 void ParseCommand(Command *currCommand){
-	char readFromUser[256];
+	char readFromUser[256]={0};
 	char* userInp[4],c='a';
 	int i=0;
 
@@ -99,7 +99,10 @@ void ParseCommand(Command *currCommand){
 		if(userInp[1]!=NULL)
 			currCommand->fileName=strcpy(currCommand->fileName,userInp[1]);
 		else
+		{
+			free(currCommand->fileName);
 			currCommand->fileName=NULL;
+		}
 	}
 	/*in case numeric values are expeced - check if they are numeric,
 	 * else - validity argument will be set to invalid input */

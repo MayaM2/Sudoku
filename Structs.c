@@ -71,67 +71,81 @@ void LFLAppend(LoadFileList* li,int row, int col, int val, int isFixed)
 /*
  * Undo-Redo List
  */
-
-UndoRedoList* undoRedoCreator(){
+UndoRedoList* undoRedoCreator(int dim){
 	UndoRedoList* li;
-	UndoRedoNode* n; /* DUMMY NODE!!!!*/
-	n=(UndoRedoNode*)calloc(1,sizeof(UndoRedoNode));
-	n->row=-1;
-	n->col=-1;
-	n->oldVal=-1;
-	n->newVal=-1;
-	n->isAutofilled=-1;
 	li=(UndoRedoList*)calloc(1,sizeof(UndoRedoList));
-	li->head=n;
+	li->head=NULL;
 	li->curr=li->head;
 	li->tail=li->head;
+	li->dim=dim;
 	return li;
 }
 
 /*
- * "Hidden" func- destroy list nodes.
+ * "Hidden" funcs- create and destroy list nodes.
  */
-void destroyNode(UndoRedoNode* n){
+
+UndoRedoNode* createURNode(int dim, int** board)
+{
+	int i=0,j=0;
+	UndoRedoNode* n;
+	n=(UndoRedoNode*)calloc(1,sizeof(UndoRedoNode));
+	n->nodeBoard=(int**)calloc(dim,sizeof(int*));
+	for(i=0;i<dim;i++)
+		n->nodeBoard[i]=(int*)calloc(dim,sizeof(int));
+	for(i=0;i<dim;i++)
+		for(j=0;j<dim;j++)
+			n->nodeBoard[i][j]=board[i][j];
+	return n;
+}
+
+void destroyNode(UndoRedoNode* n, int dim){
+	int i=0;
 	if(n!=NULL){
-		destroyNode(n->next);
+		destroyNode(n->next,dim);
+		for(i=0;i<dim;i++)
+			free(n->nodeBoard[i]);
+		free(n->nodeBoard);
 		free(n);
 	}
 }
 
 void undoRedoDestroyer(UndoRedoList* li){
-	destroyNode(li->head);
+	destroyNode(li->head,li->dim);
 	li->head=NULL;
 	free(li);
 }
 
-void undoRedoAppend(UndoRedoList* li,int row, int col, int oldVal, int newVal, int isAutofilled, int isStarter)
+void undoRedoAppend(UndoRedoList* li, int** board)
 {
-	UndoRedoNode* n;
-	UndoRedoList* dummy;
-	n=(UndoRedoNode*)calloc(1,sizeof(UndoRedoNode));
-	n->row=row;
-	n->col=col;
-	n->oldVal=oldVal;
-	n->newVal=newVal;
-	n->isAutofilled=isAutofilled;
-	n->isAutofillStarter=isStarter;
-
-	/*
-	 * if current node has next, we should delete all values following current node. in any case, append new node
-	 * after current node, and make current as well as tail of list.
-	 */
-	if(li->curr->next!=NULL){
-		dummy=undoRedoCreator();
-		dummy->head=li->curr->next;
-		li->curr->next->prev=NULL;
-		li->curr->next=NULL;
-		undoRedoDestroyer(dummy);
+	UndoRedoList *dummy;
+	UndoRedoNode *n=createURNode(li->dim,board);
+	if(li->curr==NULL)
+	{
+		li->head=n;
+		li->curr=li->head;
+		li->tail=li->head;
 	}
-	li->curr->next=n;
-	n->prev=li->curr;
-	li->curr=li->curr->next;
-	li->tail=li->curr;
+	else
+	{
+		if(li->curr->next!=NULL){
+			dummy=undoRedoCreator(li->dim);
+			dummy->head=li->curr->next;
+			li->curr->next->prev=NULL;
+			li->curr->next=NULL;
+			undoRedoDestroyer(dummy);
+		}
+		li->curr->next=n;
+		li->curr->next->prev=li->curr;
+		li->curr=li->curr->next;
+		li->tail=li->curr;
+	}
 }
+
+
+
+
+
 
 /*
  * num-solutions Stack
