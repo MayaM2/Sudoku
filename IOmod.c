@@ -45,8 +45,8 @@ int openFile(LoadFileList* li, char* fileName, int isSolve)
 			printErrorMessage("fscanf");
 			return FATAL_ERROR;
 		}
-		li->colsPerBlock=m;
-		li->rowsPerBlock=n;
+		li->colsPerBlock=n;
+		li->rowsPerBlock=m;
 		for(i=0;i<m*n;i++)
 		{
 			for(j=0;j<m*n;j++)
@@ -98,7 +98,7 @@ int saveFile(int** board, int** fixed, char* fileName, int gameMode, int blockHe
 	fp=fopen(fileName,"w");
 	if(fp==NULL)
 		return 0;
-	fprintf(fp,"%d %d\n",blockWidth,blockHeight);
+	fprintf(fp,"%d %d\n",blockHeight,blockWidth);
 	for(i=0;i<dim;i++)
 	{
 		for(j=0;j<dim;j++)
@@ -110,7 +110,7 @@ int saveFile(int** board, int** fixed, char* fileName, int gameMode, int blockHe
 				fprintf(fp," ");
 
 		}
-		if(i<dim-1)
+		/*if(i<dim-1)*/
 			fprintf(fp,"\n");
 	}
 	fclose(fp);

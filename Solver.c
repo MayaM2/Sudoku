@@ -91,7 +91,7 @@ int Autofill(int** board, int blockHeight, int blockWidth)
 				if(val!=0){
 					appended=1;
 					board[i][j]=val;
-					printf("Cell <%d,%d> set to %d\n",i+1,j+1,val);
+					printf("Cell <%d,%d> set to %d\n",j+1,i+1,val);
 				}
 			}
 		}

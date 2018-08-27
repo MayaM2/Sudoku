@@ -66,7 +66,7 @@ void printBoard()
 	int i=0,j=0;
 	for(;i<dim;i++){
 		if(i%blockHeight==0){
-			for(j=0;j<4*dim+blockWidth+1;j++)
+			for(j=0;j<4*dim+blockHeight+1;j++)
 				printf("-");
 			printf("\n");
 		}
@@ -92,7 +92,7 @@ void printBoard()
 
 		}
 	}
-	for(j=0;j<4*dim+blockWidth+1;j++)
+	for(j=0;j<4*dim+blockHeight+1;j++)
 		printf("-");
 	printf("\n");
 }
@@ -258,7 +258,7 @@ int OpenFileHelper(char* fileName)
  */
 void printsForRedoUndo(int isUndo, int row, int col, int num1, int num2)
 {
-	printf("%s %d,%d: from ",isUndo==1?"Undo":"Redo",row,col);
+	printf("%s %d,%d: from ",isUndo==1?"Undo":"Redo",col,row);
 	if(num1==0)
 		printf("_");
 	else
@@ -447,7 +447,7 @@ int generate(int X, int Y){
  *doCommand - checks type of command using switch case. Checks validity and prints error message if needed, else - calls corresponding function.
  */
 int doCommand(Command* inpCommand){
-	int i=0,j=0, sols=0,res=0,ret=0;
+	int i=0,j=0, sols=0,res=0,ret=0,row=0,col=0;
 	UndoRedoList *dummy;
 	setvbuf(stdin,NULL,_IONBF,0);
 	setvbuf(stdout,NULL,_IONBF,0);
@@ -509,8 +509,8 @@ switch(inpCommand->commands){
 
 
 	case EXIT_COMMAND: /*Available at ant time and mode*/
-		printf("Exiting...\n");
 		/*FREE MEMORY*/
+		printf("Exiting...\n");
 		MainMemoryFreer();
 		break;
 
@@ -565,14 +565,16 @@ switch(inpCommand->commands){
 		if(gameMode == EDIT ||gameMode == SOLVE){
 				if((inpCommand->validity==1)&& numInRange(inpCommand->arg1,1,dim)&&numInRange
 						(inpCommand->arg2,1,dim)&&numInRange(inpCommand->arg3,0,dim)){ /* checks if X Y Z are in range 1-N, N=dim */
-					if(fixed[inpCommand->arg1-1][inpCommand->arg2-1]==1){
+					row=inpCommand->arg2-1;
+					col=inpCommand->arg1-1;
+					if(fixed[row][col]==1){
 						printf("Error: cell is fixed\n");
 						break;
 					}
 					/* in this case, we can set the board! */
 					/*undoRedoAppend(undoRedo,(inpCommand->arg1)-1,(inpCommand->arg2)-1,
 							board[(inpCommand->arg1)-1][(inpCommand->arg2)-1],inpCommand->arg3,0,0);*/
-					board[(inpCommand->arg1)-1][(inpCommand->arg2)-1]=inpCommand->arg3;
+					board[row][col]=inpCommand->arg3;
 					undoRedoAppend(undoRedo,board);
 					/* board print may be executed by main... */
 					printBoard();
@@ -647,6 +649,7 @@ switch(inpCommand->commands){
 						if(undoRedo->curr->nodeBoard[i][j]!=undoRedo->curr->next->nodeBoard[i][j])
 						{
 							board[i][j]=undoRedo->curr->nodeBoard[i][j];
+							/*printBoard();*/ /*just for tests!!! not a must*/
 							printsForRedoUndo(1,i+1,j+1,
 									undoRedo->curr->next->nodeBoard[i][j],
 									undoRedo->curr->nodeBoard[i][j]);
@@ -719,12 +722,14 @@ switch(inpCommand->commands){
 					printf("Error: board contains erroneous values\n");
 					return 0;
 				}
-				if(fixed[inpCommand->arg1-1][inpCommand->arg2-1]==1){  /* case cell is fixed - don't execute*/
+				row=inpCommand->arg2-1;
+				col=inpCommand->arg1-1;
+				if(fixed[row][col]==1){  /* case cell is fixed - don't execute*/
 					printf("Error: cell is fixed\n");
 					return 0;
 
 				}
-				if(board[inpCommand->arg1-1][inpCommand->arg2-1]!=0){ /* case cell is not empty - don't execute*/
+				if(board[row][col]!=0){ /* case cell is not empty - don't execute*/
 					printf("Error: cell already contains a value\n");
 					return 0;
 				}
@@ -734,7 +739,7 @@ switch(inpCommand->commands){
 					return 0;
 				}
 				else{
-					printf("Hint: set cell to %d\n",solvedBoard[inpCommand->arg1-1][inpCommand->arg2-1]);
+					printf("Hint: set cell to %d\n",solvedBoard[row][col]);
 					return 0;
 				}
 			}
