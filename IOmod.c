@@ -13,7 +13,7 @@ int openFile(LoadFileList* li, char* fileName, int isSolve)
 	setvbuf(stderr,NULL,_IONBF,0);
 	setvbuf(stdin,NULL,_IONBF,0);
 	/*
-	 * this is temporary!! there is probably a default value instead of 81.
+	 * if no fileName supplied in edit, create 9 by 9 board.
 	 */
 	if(fileName==NULL)
 	{
@@ -110,8 +110,7 @@ int saveFile(int** board, int** fixed, char* fileName, int gameMode, int blockHe
 				fprintf(fp," ");
 
 		}
-		/*if(i<dim-1)*/
-			fprintf(fp,"\n");
+		fprintf(fp,"\n");
 	}
 	fclose(fp);
 	return 1;

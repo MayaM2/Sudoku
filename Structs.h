@@ -52,12 +52,6 @@ typedef struct urNode{
 	struct urNode* prev;
 	struct urNode* next;
 	int** nodeBoard;
-	/*int row;
-	int col;
-	int oldVal;
-	int newVal;
-	int isAutofilled;
-	int isAutofillStarter;*/
 } UndoRedoNode;
 
 typedef struct urList{
@@ -89,7 +83,6 @@ typedef struct stackNode{
 	struct stackNode* next;
 	int row;
 	int col;
-	int isForward;
 	int* neighborsBin;
 } RecStackNode;
 
@@ -111,11 +104,11 @@ void recStackDestroyer(RecStack* r);
  * creates new node with given info and calls first.
  */
 void recStackPush(RecStack* r, RecStackNode* n);
-void recStackPushInfo(RecStack* r, int row, int col, int isForward, int* bin, int dim);
+void recStackPushInfo(RecStack* r, int row, int col, int* bin, int dim);
 /*
  * create stack node;
  */
-RecStackNode* recStackNodeCreator(int row, int col, int isForward, int* bin, int dim);
+RecStackNode* recStackNodeCreator(int row, int col, int* bin, int dim);
 /*
  * return and update head of stack
  */

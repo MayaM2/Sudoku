@@ -495,7 +495,7 @@ void saveCommand(char* fileName)
 
 void setCommand(Command *inpCommand)
 {
-	int row=0,col=0;
+	int row=0,col=0, append=0;
 	if(gameMode == EDIT ||gameMode == SOLVE){
 			if((inpCommand->validity==1)&& numInRange(inpCommand->arg1,1,dim)&&numInRange
 					(inpCommand->arg2,1,dim)&&numInRange(inpCommand->arg3,0,dim)){ /* checks if X Y Z are in range 1-N, N=dim */
@@ -506,8 +506,11 @@ void setCommand(Command *inpCommand)
 					return;
 				}
 				/* in this case, we can set the board! */
+				if(board[row][col]!=inpCommand->arg3)
+					append=1;
 				board[row][col]=inpCommand->arg3;
-				undoRedoAppend(undoRedo,board);
+				if(append==1)
+					undoRedoAppend(undoRedo,board);
 				/* board print may be executed by main... */
 				printBoard();
 				if(allFilled()){ /* call allFilled to check if all board cells are filled */
@@ -582,7 +585,6 @@ void undoCommand()
 					if(undoRedo->curr->nodeBoard[i][j]!=undoRedo->curr->next->nodeBoard[i][j])
 					{
 						board[i][j]=undoRedo->curr->nodeBoard[i][j];
-						/*printBoard();*/ /*just for tests!!! not a must*/
 						printsForRedoUndo(1,i+1,j+1,
 								undoRedo->curr->next->nodeBoard[i][j],
 								undoRedo->curr->nodeBoard[i][j]);

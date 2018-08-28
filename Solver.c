@@ -100,44 +100,6 @@ int Autofill(int** board, int blockHeight, int blockWidth)
 	return appended;
 }
 
-/*
-void Autofill_OLD(int** board, UndoRedoList *urli, int blockHeight, int blockWidth)
-{
-	int i=0,j=0, val=0, appended=0, dim=blockHeight*blockWidth, *neighborsBin;
-	neighborsBin=(int*)calloc(dim,sizeof(int));
-	for(i=0;i<dim;i++)
-	{
-		for(j=0;j<dim;j++)
-		{
-			if(board[i][j]==0)
-			{
-				val=isObv(board,i,j,blockHeight,blockWidth,neighborsBin);
-				if(val!=0){
-					if(appended==0){
-						appended=1;
-						undoRedoAppend(urli,i,j,0,val,1,1);
-					}
-					else
-						undoRedoAppend(urli,i,j,0,val,1,0);
-				}
-			}
-		}
-	}
-	if(appended==1)
-	{
-		while(urli->curr->prev->isAutofilled==1 && urli->curr->isAutofillStarter==0)
-			urli->curr=urli->curr->prev;
-		while(urli->curr!=NULL)
-		{
-			board[urli->curr->row][urli->curr->col]=urli->curr->newVal;
-			printf("Cell <%d,%d> set to %d\n",urli->curr->row+1,urli->curr->col+1,urli->curr->newVal);
-			urli->curr=urli->curr->next;
-		}
-		urli->curr=urli->tail;
-	}
-	free(neighborsBin);
-}
-*/
 
 /*
  * "Hidden" func- return next cell in board, according to direction. -1 -1 denotes trying to leave last cell,
@@ -231,7 +193,7 @@ int numSols(int** board, int blockHeight, int blockWidth)
 				if(i<dim)
 				{
 					board[row][col]=i+1;
-					recStackPushInfo(rec,row,col,isForward,bin,dim);
+					recStackPushInfo(rec,row,col,bin,dim);
 				}
 				else
 					isForward=0;
@@ -267,29 +229,8 @@ int numSols(int** board, int blockHeight, int blockWidth)
 				isForward=1;
 			}
 		}
-		/*if(currInd>=dim)
-		{
-			printf("WEEOOWEEEOO!!! %d %d %d %d\n", n->row,n->col,currInd,isForward);
-			break;
-		}
-		printf("set [%d,%d] with %d, going %s\n",row,col,row==-1?0:board[row][col],isForward==1?"Forwards":"Backwards");
-		if(board[row][col]>12)
-			break;
-
-		printf("head=");
-		if(rec->head==NULL)
-			printf("NULL\n");
-		else
-			printf("%d %d\n",rec->head->row,rec->head->col);
-		if(row==-1 && isForward==0 && rec->head->row==11 && rec->head->col==6)
-			count++;
-		if(count>1)
-			break;
-		*/
 	}
 	while(rec->head!=NULL);
-	/*if(n!=NULL)
-		destroyStackNode(n);*/
 	recStackDestroyer(rec);
 	free(bin);
 	return sols;

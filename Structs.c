@@ -172,7 +172,7 @@ void recStackDestroyer(RecStack* r){
 	destroyStackNode(r->head);
 	free(r);
 }
-RecStackNode* recStackNodeCreator(int row, int col, int isForward, int* bin, int dim)
+RecStackNode* recStackNodeCreator(int row, int col, int* bin, int dim)
 {
 	RecStackNode* n;
 	int i=0;
@@ -181,7 +181,6 @@ RecStackNode* recStackNodeCreator(int row, int col, int isForward, int* bin, int
 	for(i=0;i<dim;i++)
 		n->neighborsBin[i]=bin[i];
 	n->col=col;
-	n->isForward=isForward;
 	n->next=NULL;
 	n->prev=NULL;
 	n->row=row;
@@ -202,9 +201,9 @@ void recStackPush(RecStack* r, RecStackNode* n)
 	}
 }
 
-void recStackPushInfo(RecStack* r, int row, int col, int isForward, int* bin, int dim)
+void recStackPushInfo(RecStack* r, int row, int col, int* bin, int dim)
 {
-	recStackPush(r,recStackNodeCreator(row,col,isForward,bin,dim));
+	recStackPush(r,recStackNodeCreator(row,col,bin,dim));
 }
 
 
