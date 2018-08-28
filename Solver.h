@@ -37,6 +37,12 @@ void nextCell(int row, int col, int isForward,int dim, int* indexes);
  * return number of solutions, or FATAL_ERROR if fatal error (with calloc) occurred.
  */
 int numSols(int** board, int blockHeight, int blockWidth);
+
+/*
+ * ILPSolver: uses Gurobi to solve a given Sudoku gameboard. Explicit details are given along the function itself.
+ * Returns 1 if a solution was found, -1 if there is no solution, or 0 if there was a runtime problem.
+ * If a solution was found - Updates the given gameboard to the solved solution.
+ */
 int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockWidth, int dim);
 
 #endif /* SOLVER_H_ */
