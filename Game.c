@@ -78,7 +78,7 @@ void printBoard()
 				printf("    ");
 			else{
 				printf(" %2d",board[i][j]);
-				if(fixed[i][j]==1)
+				if(fixed[i][j]==1 && gameMode==SOLVE)
 					printf(".");
 				else{
 					if( (gameMode==EDIT || markErrors==1) && isErroneous(j,i)==1)
@@ -242,7 +242,10 @@ int OpenFileHelper(char* fileName)
 	else{
 		if(ofres==0)
 		{
-			printf("Error: File cannot be opened\n");
+			if(gameMode==EDIT)
+				printf("Error: File cannot be opened\n");
+			else
+				printf("Error: File doesn't exist or cannot be opened\n");
 			ret= 0;
 		}
 		/*FATAL ERROR*/
@@ -467,7 +470,6 @@ switch(inpCommand->commands){
 
 	case EDIT_COMMAND:
 		gameMode=EDIT;
-		markErrors=1;
 		res=OpenFileHelper(inpCommand->fileName);
 		if(res!=1)
 		{
@@ -567,7 +569,7 @@ switch(inpCommand->commands){
 						(inpCommand->arg2,1,dim)&&numInRange(inpCommand->arg3,0,dim)){ /* checks if X Y Z are in range 1-N, N=dim */
 					row=inpCommand->arg2-1;
 					col=inpCommand->arg1-1;
-					if(fixed[row][col]==1){
+					if(fixed[row][col]==1 && gameMode==SOLVE){
 						printf("Error: cell is fixed\n");
 						break;
 					}
@@ -621,6 +623,7 @@ switch(inpCommand->commands){
 				}
 				else{/*puzzle generation successful*/
 					printBoard();
+					undoRedoAppend(undoRedo,board);
 				}
 			}	/* end of numbers in range*/
 			else{ /* numbers are not in range*/
@@ -715,7 +718,7 @@ switch(inpCommand->commands){
 		if(gameMode == SOLVE){
 			 /* checks if any integers were given as X Y Z */
 				if(!((inpCommand->validity==1)&&(numInRange(inpCommand->arg1,1,dim)&&numInRange(inpCommand->arg2,1,dim)))){ /* checks if X Y Z are integers in range 1-N, N=dim*/
-					printf("Error: value not in range 0-%d\n",dim);
+					printf("Error: value not in range 1-%d\n",dim);
 					return 0;
 				} /* end of numbers not in range*/
 				if(isBoardErroneous()){ /* case board is erroneous - don't execute*/

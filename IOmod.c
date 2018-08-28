@@ -38,12 +38,12 @@ int openFile(LoadFileList* li, char* fileName, int isSolve)
 		if(fscanf(fp,"%d",&m)!=1)
 		{
 			printErrorMessage("fscanf");
-			return FATAL_ERROR;
+			return 0;
 		}
 		if(fscanf(fp,"%d",&n)!=1)
 		{
 			printErrorMessage("fscanf");
-			return FATAL_ERROR;
+			return 0;
 		}
 		li->colsPerBlock=n;
 		li->rowsPerBlock=m;
@@ -55,7 +55,7 @@ int openFile(LoadFileList* li, char* fileName, int isSolve)
 				if(fscanf(fp,"%2d",&curr)!=1)
 				{
 					printErrorMessage("fscanf");
-					return FATAL_ERROR;
+					return 0;
 				}
 				if(ftell(fp)!=endPos)
 				{
@@ -67,14 +67,14 @@ int openFile(LoadFileList* li, char* fileName, int isSolve)
 						if(c==EOF)
 						{
 							printErrorMessage("fgetc");
-							return FATAL_ERROR;
+							return 0;
 						}
 						else
 						{
 							if(fseek(fp,-1,SEEK_CUR)!=0)
 							{
 								printErrorMessage("fseek");
-								return FATAL_ERROR;
+								return 0;
 							}
 						}
 					}

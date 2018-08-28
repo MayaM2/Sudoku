@@ -5,10 +5,6 @@
 #include "Structs.h"
 #include "Game.h"
 #include "Parser.h"
-/*
-#include "Solver.h"
-#include "IOmod.h"
-*/
 
 int main()
 {

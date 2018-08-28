@@ -77,10 +77,11 @@ void ParseCommand(Command *currCommand){
 
 	/* split user's input by whitespaces */
 	userInp[0] = strtok(readFromUser," \t\r\n");
-	if(strcmp(userInp[0],"solve")==0 || strcmp(userInp[0],"edit")==0|| strcmp(userInp[0],"save")==0)
+	/*if(strcmp(userInp[0],"solve")==0 || strcmp(userInp[0],"edit")==0|| strcmp(userInp[0],"save")==0)
 		userInp[1] = strtok(NULL,"\t\r\n");
 	else
-		userInp[1] = strtok(NULL," \t\r\n");
+		userInp[1] = strtok(NULL," \t\r\n");*/
+	userInp[1] = strtok(NULL," \t\r\n");
 	userInp[2] = strtok(NULL," \t\r\n");
 	userInp[3] = strtok(NULL," \t\r\n");
 
