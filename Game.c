@@ -199,6 +199,7 @@ void MainMemoryFreer()
 	if(undoRedo!=NULL)
 		undoRedoDestroyer(undoRedo);
 }
+
 void MainMemoryCreator()
 {
 	int i=0;
@@ -273,7 +274,6 @@ void printsForRedoUndo(int isUndo, int row, int col, int num1, int num2)
 		printf("%d",num2);
 	printf("\n");
 }
-
 
 
 /*
@@ -446,12 +446,219 @@ int generate(int X, int Y){
 }
 
 
+void resetCommand()
+{
+	int i=0,j=0;
+	UndoRedoList *dummy;
+	if(gameMode==SOLVE || gameMode==EDIT){
+		undoRedo->curr=undoRedo->head;
+		if(undoRedo->head->next!=NULL)
+		{
+			dummy=undoRedoCreator(dim);
+			dummy->head=undoRedo->head->next;
+			undoRedo->head->next=NULL;
+			dummy->head->prev=NULL;
+			undoRedoDestroyer(dummy);
+		}
+		for(i=0;i<dim;i++)
+			for(j=0;j<dim;j++)
+				board[i][j]=undoRedo->head->nodeBoard[i][j];
+		printf("Board reset\n");
+		printBoard();
+	}
+	else{
+		printf("ERROR: invalid command\n");
+	}
+}
+
+void saveCommand(char* fileName)
+{
+	if(gameMode==INIT)
+		printf("ERROR: invalid command\n");
+	else{
+			if(gameMode==EDIT && isBoardErroneous()==1)
+				printf("Error: board contains erroneous values\n");
+			else
+			{
+				if(gameMode==EDIT && validate(0)!=1)
+					printf("Error: board validation failed\n");
+				else
+				{
+					if(saveFile(board,fixed,fileName,gameMode,blockHeight,blockWidth)==1)
+						printf("Saved to: %s\n",fileName);
+					else
+						printf("Error: File cannot be created or modified\n");
+				}
+			}
+		}
+}
+
+void setCommand(Command *inpCommand)
+{
+	int row=0,col=0;
+	if(gameMode == EDIT ||gameMode == SOLVE){
+			if((inpCommand->validity==1)&& numInRange(inpCommand->arg1,1,dim)&&numInRange
+					(inpCommand->arg2,1,dim)&&numInRange(inpCommand->arg3,0,dim)){ /* checks if X Y Z are in range 1-N, N=dim */
+				row=inpCommand->arg2-1;
+				col=inpCommand->arg1-1;
+				if(fixed[row][col]==1 && gameMode==SOLVE){
+					printf("Error: cell is fixed\n");
+					return;
+				}
+				/* in this case, we can set the board! */
+				board[row][col]=inpCommand->arg3;
+				undoRedoAppend(undoRedo,board);
+				/* board print may be executed by main... */
+				printBoard();
+				if(allFilled()){ /* call allFilled to check if all board cells are filled */
+
+					if(validate(0)==1){ /*validate board*/
+						printf("Puzzle solved successfully\n"); /* case board is filled and valid - end of game */
+						gameMode=INIT;
+					}
+					else{
+						printf("Puzzle solution erroneous\n"); /*case board is filled and not valid */
+					}
+				}
+			}	/* end of numbers in range*/
+			else{ /* numbers are not in range*/
+				printf("Error: value not in range 0-%d\n",dim);
+			}
+	}
+	else{ /* not in edit or solve mode */
+		printf("ERROR: invalid command\n");
+	}
+}
+
+void generateCommand(Command* inpCommand)
+{
+	int i=0,j=0;
+	if(gameMode == EDIT){
+		if(!isBoardEmpty()){
+			printf("Error: board is not empty\n");
+			return;
+		}
+		/* checks if any integers were given as X Y, and wheather they are in the right range */
+		if((inpCommand->validity==1)&&numInRange(inpCommand->arg1,0,dim*dim)&&numInRange(inpCommand->arg2,0,dim*dim)){ /* checks if X Y Z are in range 0-Dim*Dim */
+			/* in this case, we can generate a new board!! */
+			if(!generate(inpCommand->arg1,inpCommand->arg2)){ /*generation process*/
+				for(i=0;i<dim;i++){ /* if fails - reclean board*/
+					for(j=0;j<dim;j++){
+						board[i][j]=0;
+					}
+				}
+				printf("Error: puzzle generator failed\n");
+			}
+			else{/*puzzle generation successful*/
+				printBoard();
+				undoRedoAppend(undoRedo,board);
+			}
+		}	/* end of numbers in range*/
+		else{ /* numbers are not in range*/
+			printf("Error: value not in range 0-%d\n",dim*dim);
+			return;
+		}
+	}
+	else{/* not in edit or solve mode */
+		printf("ERROR: invalid command\n");
+	}
+}
+
+void undoCommand()
+{
+	int i=0,j=0;
+	if(gameMode==INIT)
+		printf("ERROR: invalid command\n");
+	else
+	{
+		/*if dummy node at head, nothing to undo*/
+		if(undoRedo->curr->prev==NULL)
+			printf("Error: no moves to undo\n");
+		else
+		{
+			undoRedo->curr=undoRedo->curr->prev;
+			for(i=0;i<dim;i++)
+				for(j=0;j<dim;j++)
+					if(undoRedo->curr->nodeBoard[i][j]!=undoRedo->curr->next->nodeBoard[i][j])
+					{
+						board[i][j]=undoRedo->curr->nodeBoard[i][j];
+						/*printBoard();*/ /*just for tests!!! not a must*/
+						printsForRedoUndo(1,i+1,j+1,
+								undoRedo->curr->next->nodeBoard[i][j],
+								undoRedo->curr->nodeBoard[i][j]);
+					}
+		}
+	}
+}
+
+void redoCommand()
+{
+	int i=0,j=0;
+	if(gameMode==INIT)
+		printf("ERROR: invalid command\n");
+	else
+	{
+		if(undoRedo->curr->next==NULL)
+			printf("Error: no moves to redo\n");
+		else
+		{
+			undoRedo->curr=undoRedo->curr->next;
+			for(i=0;i<dim;i++)
+				for(j=0;j<dim;j++)
+					if(undoRedo->curr->nodeBoard[i][j]!=undoRedo->curr->prev->nodeBoard[i][j])
+					{
+						board[i][j]=undoRedo->curr->nodeBoard[i][j];
+						printsForRedoUndo(0,i+1,j+1,
+								undoRedo->curr->prev->nodeBoard[i][j],
+								undoRedo->curr->nodeBoard[i][j]);
+					}
+		}
+	}
+}
+
+void hintCommand(Command* inpCommand)
+{
+	int row=0,col=0,i=0;
+	if(gameMode == SOLVE){
+		 /* checks if any integers were given as X Y Z */
+			if(!((inpCommand->validity==1)&&(numInRange(inpCommand->arg1,1,dim)&&numInRange(inpCommand->arg2,1,dim)))){ /* checks if X Y Z are integers in range 1-N, N=dim*/
+				printf("Error: value not in range 1-%d\n",dim);
+				return;
+			} /* end of numbers not in range*/
+			if(isBoardErroneous()){ /* case board is erroneous - don't execute*/
+				printf("Error: board contains erroneous values\n");
+				return;
+			}
+			row=inpCommand->arg2-1;
+			col=inpCommand->arg1-1;
+			if(fixed[row][col]==1){  /* case cell is fixed - don't execute*/
+				printf("Error: cell is fixed\n");
+				return;
+
+			}
+			if(board[row][col]!=0){ /* case cell is not empty - don't execute*/
+				printf("Error: cell already contains a value\n");
+				return;
+			}
+			i=ILPSolver(board,fixed,solvedBoard,blockHeight,blockWidth,dim);
+			if(!i){
+				printf("Error: board is unsolvable\n");
+				return;
+			}
+			else{
+				printf("Hint: set cell to %d\n",solvedBoard[row][col]);
+				return;
+			}
+		}
+	else{/* not in edit or solve mode */
+		printf("ERROR: invalid command\n");
+	}
+}
 /*
  *doCommand - checks type of command using switch case. Checks validity and prints error message if needed, else - calls corresponding function.
  */
 int doCommand(Command* inpCommand){
-	int i=0,j=0, sols=0,res=0,ret=0,row=0,col=0;
-	UndoRedoList *dummy;
+	int sols=0,res=0,ret=0;
 	setvbuf(stdin,NULL,_IONBF,0);
 	setvbuf(stdout,NULL,_IONBF,0);
 switch(inpCommand->commands){
@@ -481,32 +688,7 @@ switch(inpCommand->commands){
 		break;
 
 	case RESET_COMMAND: /*ALMOST DONE*/
-		if(gameMode==SOLVE || gameMode==EDIT){
-			undoRedo->curr=undoRedo->head;
-			if(undoRedo->head->next!=NULL)
-			{
-				dummy=undoRedoCreator(dim);
-				dummy->head=undoRedo->head->next;
-				undoRedo->head->next=NULL;
-				dummy->head->prev=NULL;
-				undoRedoDestroyer(dummy);
-			}
-			for(i=0;i<dim;i++)
-				for(j=0;j<dim;j++)
-					board[i][j]=undoRedo->head->nodeBoard[i][j];
-			/*while node is NOT dummy, move backwards*/
-			/*while(undoRedo->curr->row!=-1){
-				board[undoRedo->curr->row][undoRedo->curr->col]=undoRedo->curr->oldVal;
-				undoRedo->curr=undoRedo->curr->prev;
-			}
-			undoRedoDestroyer(undoRedo);
-			undoRedo=undoRedoCreator();*/
-			printf("Board reset\n");
-			printBoard();
-		}
-		else{
-			printf("ERROR: invalid command\n");
-		}
+		resetCommand();
 		break;
 
 
@@ -517,32 +699,13 @@ switch(inpCommand->commands){
 		break;
 
 	case SAVE_COMMAND:
-		if(gameMode==INIT)
-			printf("ERROR: invalid command\n");
-		else{
-				if(gameMode==EDIT && isBoardErroneous()==1)
-					printf("Error: board contains erroneous values\n");
-				else
-				{
-					if(gameMode==EDIT && validate(0)!=1)
-						printf("Error: board validation failed\n");
-					else
-					{
-						if(saveFile(board,fixed,inpCommand->fileName,gameMode,blockHeight,blockWidth)==1)
-							printf("Saved to: %s\n",inpCommand->fileName);
-						else
-							printf("Error: File cannot be created or modified\n");
-					}
-				}
-			}
+		saveCommand(inpCommand->fileName);
 		break;
 
 	case MARKERRORS_COMMAND: /*ALMOST DONE*/
 		if(gameMode==SOLVE){
 			if(inpCommand->arg1==0 || inpCommand->arg1==1){
 						markErrors=inpCommand->arg1;
-						/*INSERT mark errors command*/
-						/*print board accordingly */
 			}
 			else{ /* case we are in solve mode but the input is invalid */
 				printf("Error: the value should be 0 or 1\n");
@@ -564,40 +727,7 @@ switch(inpCommand->commands){
 		break;
 
 	case SET_COMMAND: /*ALMOST DONE*/
-		if(gameMode == EDIT ||gameMode == SOLVE){
-				if((inpCommand->validity==1)&& numInRange(inpCommand->arg1,1,dim)&&numInRange
-						(inpCommand->arg2,1,dim)&&numInRange(inpCommand->arg3,0,dim)){ /* checks if X Y Z are in range 1-N, N=dim */
-					row=inpCommand->arg2-1;
-					col=inpCommand->arg1-1;
-					if(fixed[row][col]==1 && gameMode==SOLVE){
-						printf("Error: cell is fixed\n");
-						break;
-					}
-					/* in this case, we can set the board! */
-					/*undoRedoAppend(undoRedo,(inpCommand->arg1)-1,(inpCommand->arg2)-1,
-							board[(inpCommand->arg1)-1][(inpCommand->arg2)-1],inpCommand->arg3,0,0);*/
-					board[row][col]=inpCommand->arg3;
-					undoRedoAppend(undoRedo,board);
-					/* board print may be executed by main... */
-					printBoard();
-					if(allFilled()){ /* call allFilled to check if all board cells are filled */
-
-						if(validate(0)==1){ /*validate board*/
-							printf("Puzzle solved successfully\n"); /* case board is filled and valid - end of game */
-							gameMode=INIT;
-						}
-						else{
-							printf("Puzzle solution erroneous\n"); /*case board is filled and not valid */
-						}
-					}
-				}	/* end of numbers in range*/
-				else{ /* numbers are not in range*/
-					printf("Error: value not in range 0-%d\n",dim);
-				}
-		}
-		else{ /* not in edit or solve mode */
-			printf("ERROR: invalid command\n");
-		}
+		setCommand(inpCommand);
 		break;
 
 	case VALIDATE_COMMAND: /*DONE*/
@@ -605,150 +735,19 @@ switch(inpCommand->commands){
 		break;
 
 	case GENERATE_COMMAND:
-		if(gameMode == EDIT){
-			if(!isBoardEmpty()){
-				printf("Error: board is not empty\n");
-				break;
-			}
-			/* checks if any integers were given as X Y, and wheather they are in the right range */
-			if((inpCommand->validity==1)&&numInRange(inpCommand->arg1,0,dim*dim)&&numInRange(inpCommand->arg2,0,dim*dim)){ /* checks if X Y Z are in range 0-Dim*Dim */
-				/* in this case, we can generate a new board!! */
-				if(!generate(inpCommand->arg1,inpCommand->arg2)){ /*generation process*/
-					for(i=0;i<dim;i++){ /* if fails - reclean board*/
-						for(j=0;j<dim;j++){
-							board[i][j]=0;
-						}
-					}
-					printf("Error: puzzle generator failed\n");
-				}
-				else{/*puzzle generation successful*/
-					printBoard();
-					undoRedoAppend(undoRedo,board);
-				}
-			}	/* end of numbers in range*/
-			else{ /* numbers are not in range*/
-				printf("Error: value not in range 0-%d\n",dim*dim);
-				return 0;
-			}
-		}
-		else{/* not in edit or solve mode */
-			printf("ERROR: invalid command\n");
-		}
+		generateCommand(inpCommand);
 		break;
 
 	case UNDO_COMMAND:
-		if(gameMode==INIT)
-			printf("ERROR: invalid command\n");
-		else
-		{
-			/*if dummy node at head, nothing to undo*/
-			if(undoRedo->curr->prev==NULL)
-				printf("Error: no moves to undo\n");
-			else
-			{
-				undoRedo->curr=undoRedo->curr->prev;
-				for(i=0;i<dim;i++)
-					for(j=0;j<dim;j++)
-						if(undoRedo->curr->nodeBoard[i][j]!=undoRedo->curr->next->nodeBoard[i][j])
-						{
-							board[i][j]=undoRedo->curr->nodeBoard[i][j];
-							/*printBoard();*/ /*just for tests!!! not a must*/
-							printsForRedoUndo(1,i+1,j+1,
-									undoRedo->curr->next->nodeBoard[i][j],
-									undoRedo->curr->nodeBoard[i][j]);
-						}
-				/*
-				while(i==0){
-					i++;
-					board[undoRedo->curr->row][undoRedo->curr->col]=undoRedo->curr->oldVal;
-					printsForRedoUndo(1,undoRedo->curr->row+1,undoRedo->curr->col+1,
-							undoRedo->curr->newVal,
-							undoRedo->curr->oldVal);
-					undoRedo->curr=undoRedo->curr->prev;
-					if(undoRedo->curr->row==-1)
-						break;
-					if(undoRedo->curr->isAutofilled==1 && undoRedo->curr->next->isAutofilled==1 && undoRedo->curr->next->isAutofillStarter==0)
-						i--;
-				}
-				*/
-			}
-		}
+		undoCommand();
 		break;
 
 	case REDO_COMMAND:
-		if(gameMode==INIT)
-			printf("ERROR: invalid command\n");
-		else
-		{
-			if(undoRedo->curr->next==NULL)
-				printf("Error: no moves to redo\n");
-			else
-			{
-				undoRedo->curr=undoRedo->curr->next;
-				for(i=0;i<dim;i++)
-					for(j=0;j<dim;j++)
-						if(undoRedo->curr->nodeBoard[i][j]!=undoRedo->curr->prev->nodeBoard[i][j])
-						{
-							board[i][j]=undoRedo->curr->nodeBoard[i][j];
-							printsForRedoUndo(0,i+1,j+1,
-									undoRedo->curr->prev->nodeBoard[i][j],
-									undoRedo->curr->nodeBoard[i][j]);
-						}
-				/*
-				while(i==0){
-					i++;
-					undoRedo->curr=undoRedo->curr->next;
-					printsForRedoUndo(0,undoRedo->curr->row+1,undoRedo->curr->col+1,
-							undoRedo->curr->oldVal,
-							undoRedo->curr->newVal);
-					board[undoRedo->curr->row][undoRedo->curr->col]=undoRedo->curr->newVal;
-					if(undoRedo->curr->next!=NULL && undoRedo->curr->isAutofilled==1 && undoRedo->curr->next->isAutofilled==1 && undoRedo->curr->next->isAutofillStarter==0)
-						i--;
-					if(undoRedo->curr->next==NULL)
-						break;
-				}
-				if(undoRedo->curr==NULL)
-					undoRedo->curr=undoRedo->tail;
-				*/
-			}
-		}
+		redoCommand();
 		break;
 
 	case HINT_COMMAND:
-		if(gameMode == SOLVE){
-			 /* checks if any integers were given as X Y Z */
-				if(!((inpCommand->validity==1)&&(numInRange(inpCommand->arg1,1,dim)&&numInRange(inpCommand->arg2,1,dim)))){ /* checks if X Y Z are integers in range 1-N, N=dim*/
-					printf("Error: value not in range 1-%d\n",dim);
-					return 0;
-				} /* end of numbers not in range*/
-				if(isBoardErroneous()){ /* case board is erroneous - don't execute*/
-					printf("Error: board contains erroneous values\n");
-					return 0;
-				}
-				row=inpCommand->arg2-1;
-				col=inpCommand->arg1-1;
-				if(fixed[row][col]==1){  /* case cell is fixed - don't execute*/
-					printf("Error: cell is fixed\n");
-					return 0;
-
-				}
-				if(board[row][col]!=0){ /* case cell is not empty - don't execute*/
-					printf("Error: cell already contains a value\n");
-					return 0;
-				}
-				i=ILPSolver(board,fixed,solvedBoard,blockHeight,blockWidth,dim);
-				if(!i){
-					printf("Error: board is unsolvable\n");
-					return 0;
-				}
-				else{
-					printf("Hint: set cell to %d\n",solvedBoard[row][col]);
-					return 0;
-				}
-			}
-		else{/* not in edit or solve mode */
-			printf("ERROR: invalid command\n");
-		}
+		hintCommand(inpCommand);
 		break;
 
 	case NUMSOLUTIONS_COMMAND:
