@@ -182,7 +182,6 @@ RecStackNode* recStackNodeCreator(int row, int col, int* bin, int dim)
 		n->neighborsBin[i]=bin[i];
 	n->col=col;
 	n->next=NULL;
-	n->prev=NULL;
 	n->row=row;
 	return n;
 }
@@ -196,7 +195,6 @@ void recStackPush(RecStack* r, RecStackNode* n)
 	else
 	{
 		n->next=r->head;
-		r->head->prev=n;
 		r->head=n;
 	}
 }
@@ -211,8 +209,6 @@ RecStackNode* recStackPop(RecStack* r)
 {
 	RecStackNode* n;
 	n=r->head;
-	if(n->next!=NULL)
-		n->next->prev=NULL;
 	r->head=n->next;
 	n->next=NULL;
 	return n;

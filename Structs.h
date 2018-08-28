@@ -7,7 +7,7 @@
  */
 typedef struct Command{
 	int commands;
-	int validity; /* until said otherwise */
+	int validity;
 	int arg1;
 	int arg2;
 	int arg3;
@@ -79,7 +79,6 @@ void undoRedoAppend(UndoRedoList* li, int** board);
  * num-solutions Stack
  */
 typedef struct stackNode{
-	struct stackNode* prev;
 	struct stackNode* next;
 	int row;
 	int col;

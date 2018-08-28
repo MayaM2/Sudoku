@@ -173,10 +173,7 @@ int validate(int printMessage)
 	}
 }
 
-/*
- * "Hidden" functions- Freer frees old memory, Creator calls freer and creates new.
- * The reason for the split is that sometimes freer needs to be called alone (eg- exit command)
- */
+
 void MainMemoryFreer()
 {
 	int i=0;
@@ -200,29 +197,40 @@ void MainMemoryFreer()
 		undoRedoDestroyer(undoRedo);
 }
 
-void MainMemoryCreator()
+int MainMemoryCreator()
 {
-	int i=0;
+	int i=0,ret=1;
 	/*new allocation*/
 	board=(int**)calloc(dim,sizeof(int*));
 	fixed=(int**)calloc(dim,sizeof(int*));
 	solvedBoard=(int**)calloc(dim,sizeof(int*));
 	undoRedo=undoRedoCreator(dim);
-	for(i=0;i<dim;i++){
+	if(board==NULL || fixed==NULL || solvedBoard==NULL)
+		ret= FATAL_ERROR;
+	for(i=0;i<dim && ret!=FATAL_ERROR;i++){
 		board[i]=(int*)calloc(dim,sizeof(int));
 		fixed[i]=(int*)calloc(dim,sizeof(int));
 		solvedBoard[i]=(int*)calloc(dim,sizeof(int));
+		if(board[i]==NULL || fixed[i]==NULL || solvedBoard[i]==NULL)
+		{
+			ret=FATAL_ERROR;
+			break;
+		}
 	}
+	return ret;
 }
 
-/*
- * "Hidden" function- for both openfile commands (solve and edit)
- */
+
 int OpenFileHelper(char* fileName)
 {
 	LoadFileList *li;
 	int ret=1, ofres=0;
 	li=LFLCreator();
+	if(li==NULL)
+	{
+		printErrorMessage("calloc");
+		return FATAL_ERROR;
+	}
 	ofres=openFile(li,fileName,gameMode==SOLVE?1:0);
 	if(ofres==1)
 	{
@@ -230,7 +238,11 @@ int OpenFileHelper(char* fileName)
 		blockHeight=li->rowsPerBlock;
 		blockWidth=li->colsPerBlock;
 		dim=blockWidth*blockHeight;
-		MainMemoryCreator();
+		if(MainMemoryCreator()==FATAL_ERROR)
+		{
+			printErrorMessage("calloc");
+			return FATAL_ERROR;
+		}
 		li->curr=li->head;
 		while(li->curr!=NULL)
 		{
@@ -241,25 +253,17 @@ int OpenFileHelper(char* fileName)
 		undoRedoAppend(undoRedo,board);
 	}
 	else{
-		if(ofres==0)
-		{
 			if(gameMode==EDIT)
 				printf("Error: File cannot be opened\n");
 			else
 				printf("Error: File doesn't exist or cannot be opened\n");
 			ret= 0;
-		}
-		/*FATAL ERROR*/
-		else if (ofres==FATAL_ERROR)
-			return FATAL_ERROR;
 	}
 	LFLDestructor(li);
 	return ret;
 }
 
-/*
- * "hidden" func- for prints from redo/undo
- */
+
 void printsForRedoUndo(int isUndo, int row, int col, int num1, int num2)
 {
 	printf("%s %d,%d: from ",isUndo==1?"Undo":"Redo",col,row);
@@ -445,6 +449,9 @@ int generate(int X, int Y){
 	return 1;
 }
 
+/*
+ * all the following are "hidden" funcs, which doCommand (at the bottom) calls to do the actual commands.
+ */
 
 void resetCommand()
 {
@@ -657,6 +664,10 @@ void hintCommand(Command* inpCommand)
 	}
 }
 /*
+ * END OF HIDDEN DOCOMMAND HELPERS
+ */
+
+/*
  *doCommand - checks type of command using switch case. Checks validity and prints error message if needed, else - calls corresponding function.
  */
 int doCommand(Command* inpCommand){
@@ -763,7 +774,12 @@ switch(inpCommand->commands){
 			else
 			{
 				sols=numSols(board,blockHeight,blockWidth);
-
+				if(sols==FATAL_ERROR)
+				{
+					printErrorMessage("calloc");
+					ret=FATAL_ERROR;
+					break;
+				}
 				printf("Number of solutions: %d\n",sols);
 				if(sols!=0)
 				{
@@ -785,7 +801,14 @@ switch(inpCommand->commands){
 			if(isBoardErroneous()==1)
 				printf("Error: board contains erroneous values\n");
 			else{
-				if(Autofill(board, blockHeight, blockWidth)==1)
+				ret=Autofill(board, blockHeight, blockWidth);
+				if(ret==FATAL_ERROR)
+				{
+					printErrorMessage("calloc");
+					ret=FATAL_ERROR;
+					break;
+				}
+				if(ret==1)
 					undoRedoAppend(undoRedo,board);
 				printBoard();
 				if(allFilled() && validate(0)==1){ /*validate board*/

@@ -14,9 +14,7 @@
 /* Gurobi variables and declarations :*/
 #include "gurobi_c.h"
 
-/*
- * "Hidden" func- updates binary neighbors array.
- */
+
 void updateNeighbors(int** board, int row, int col,int blockHeight, int blockWidth, int* neighborsBin)
 {
 	int i=0, j=0, val=0,dim=blockHeight*blockWidth;
@@ -58,9 +56,8 @@ void updateNeighbors(int** board, int row, int col,int blockHeight, int blockWid
 	}
 }
 
-/*
- * "Hidden" func- check neighbors. if only one val is possible, return it, else 0;
- */
+
+
 int isObv(int** board, int row, int col,int blockHeight, int blockWidth, int* neighborsBin)
 {
 	int i=0, dim=blockWidth*blockHeight,count=dim;
@@ -81,6 +78,8 @@ int Autofill(int** board, int blockHeight, int blockWidth)
 {
 	int i=0,j=0, val=0, appended=0, dim=blockHeight*blockWidth, *neighborsBin;
 	neighborsBin=(int*)calloc(dim,sizeof(int));
+	if(neighborsBin==NULL)
+		return FATAL_ERROR;
 	for(i=0;i<dim;i++)
 	{
 		for(j=0;j<dim;j++)
@@ -101,10 +100,7 @@ int Autofill(int** board, int blockHeight, int blockWidth)
 }
 
 
-/*
- * "Hidden" func- return next cell in board, according to direction. -1 -1 denotes trying to leave last cell,
- * -2 -2 denotes trying to go before first cell.
- */
+
 void nextCell(int row, int col, int isForward,int dim, int* indexes){
 
 	/* forward */
@@ -143,19 +139,6 @@ void nextCell(int row, int col, int isForward,int dim, int* indexes){
 	}
 }
 
-void demoPrint(int sols, int dim, int** board)
-{
-	int j=0,k=0;
-	printf("sol #%d:\n",sols);
-	for(j=0;j<dim;j++)
-	{
-		for(k=0;k<dim;k++)
-		{
-			printf("%2d ",board[j][k]);
-		}
-		printf("\n");
-	}
-}
 
 int numSols(int** board, int blockHeight, int blockWidth)
 {
@@ -164,6 +147,8 @@ int numSols(int** board, int blockHeight, int blockWidth)
 	RecStack *rec = recStackCreator();
 	RecStackNode *n;
 	bin=(int*)calloc(dim,sizeof(int));
+	if(bin==NULL || rec==NULL)
+		return FATAL_ERROR;
 	do
 	{
 		/*
