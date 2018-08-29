@@ -76,17 +76,27 @@ int isObv(int** board, int row, int col,int blockHeight, int blockWidth, int* ne
 
 int Autofill(int** board, int blockHeight, int blockWidth)
 {
-	int i=0,j=0, val=0, appended=0, dim=blockHeight*blockWidth, *neighborsBin;
+	int i=0,j=0, val=0, appended=0, dim=blockHeight*blockWidth, *neighborsBin, **copyBoard;
 	neighborsBin=(int*)calloc(dim,sizeof(int));
-	if(neighborsBin==NULL)
+	copyBoard=(int**)calloc(dim,sizeof(int*));
+	if(neighborsBin==NULL || copyBoard==NULL)
 		return FATAL_ERROR;
+	for(i=0;i<dim;i++)
+	{
+		copyBoard[i]=(int*)calloc(dim,sizeof(int));
+		if(copyBoard[i]==NULL)
+			return FATAL_ERROR;
+	}
+	for(i=0;i<dim;i++)
+		for(j=0;j<dim;j++)
+			copyBoard[i][j]=board[i][j];
 	for(i=0;i<dim;i++)
 	{
 		for(j=0;j<dim;j++)
 		{
-			if(board[i][j]==0)
+			if(copyBoard[i][j]==0)
 			{
-				val=isObv(board,i,j,blockHeight,blockWidth,neighborsBin);
+				val=isObv(copyBoard,i,j,blockHeight,blockWidth,neighborsBin);
 				if(val!=0){
 					appended=1;
 					board[i][j]=val;
@@ -95,6 +105,9 @@ int Autofill(int** board, int blockHeight, int blockWidth)
 			}
 		}
 	}
+	for(i=0;i<dim;i++)
+		free(copyBoard[i]);
+	free(copyBoard);
 	free(neighborsBin);
 	return appended;
 }
