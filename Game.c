@@ -5,7 +5,6 @@
 #include "Structs.h"
 #include "IOmod.h"
 #include "Solver.h"
-
 int **board=NULL;
 int **fixed=NULL;
 int**solvedBoard=NULL;
@@ -174,6 +173,7 @@ int validate(int printMessage)
 		/*case there was a runtime-problem - ILPSolver prints error massege and
 		 * we will return from current doCommand call. */
 		else if (passed == 0){
+			printf("Error: Gurobi Optimizer encountered a run-time problem\n");
 			return 0;
 		}
 		else{
@@ -691,6 +691,7 @@ void hintCommand(Command* inpCommand)
 			/*case there was a runtime-problem - ILPSolver prints error massege and
 			 * we will return from current hintCommand call. */
 			else if (i == 0){
+				printf("Error: Gurobi Optimizer encountered a run-time problem\n");
 				return;
 			}
 			else{
