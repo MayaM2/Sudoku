@@ -13,7 +13,7 @@
 #include "Structs.h"
 
 /*
- * Returns 1 if string represents an int,
+ * IsInteger - "hidden" function that returns 1 if a given string represents an integer,
  * returns 0 otherwise.
  */
 int IsInteger(const char* s)
