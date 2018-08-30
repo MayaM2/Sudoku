@@ -8,7 +8,10 @@
 #ifndef PARSER_H_
 #define PARSER_H_
 
+/*
+ * Reads game command from user and returns
+ * a corresponding command struct.
+ */
 void ParseCommand(Command *currCommand);
-int IsInteger(const char* s);
 
 #endif /* PARSER_H_ */

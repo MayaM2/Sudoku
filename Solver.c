@@ -14,7 +14,11 @@
 /* Gurobi variables and declarations :*/
 #include "gurobi_c.h"
 
-
+/*
+ * updateNeighbors- an auxilliary func of autofill and numSols. updates binary array neighborsBin according
+ *  to neighbors of cell <col,row> of board, ie values in row, col, and block. 1 at index i in neighborsBin
+ *  denotes that value i+1 is a neighbor of cell <col,row>, 0 denotes that it is not.
+ */
 void updateNeighbors(int** board, int row, int col,int blockHeight, int blockWidth, int* neighborsBin)
 {
 	int i=0, j=0, val=0,dim=blockHeight*blockWidth;
@@ -57,7 +61,10 @@ void updateNeighbors(int** board, int row, int col,int blockHeight, int blockWid
 }
 
 
-
+/*
+ * isObv- an auxilliary func of autofill. checks if cell <col,row> is obviously filled, ie has one possible
+ * value to be filled in. returns 1 if obvious, else 0.
+ */
 int isObv(int** board, int row, int col,int blockHeight, int blockWidth, int* neighborsBin)
 {
 	int i=0, dim=blockWidth*blockHeight,count=dim;
@@ -113,7 +120,10 @@ int Autofill(int** board, int blockHeight, int blockWidth)
 }
 
 
-
+/*
+ * nextCell- retrieves next cell to be checked in board. updates indexes array accordingly. [-2,-2] denotes
+ * going before first empty cell, and [-1,-1] denotes going after last empty cell. auxilliary to numSols.
+ */
 void nextCell(int row, int col, int isForward,int dim, int* indexes){
 
 	/* forward */

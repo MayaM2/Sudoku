@@ -16,6 +16,10 @@ int gameMode=INIT;
 int markErrors=1;
 UndoRedoList *undoRedo=NULL;
 
+/*
+ *  isErroneous- "hidden" func. checks if non-zero value at <col,row> exists in it's row, column, or block.
+ *  returns 1 if so, 0 else.
+ */
 int isErroneous(int col, int row)
 {
 	int i=0, j=0;
@@ -51,6 +55,10 @@ int isErroneous(int col, int row)
 	return 0;
 }
 
+/*
+ *  isBoardErroneous- "hidden" func. checks if there are erroneous values in the board using isErroneous.
+ *  returns 1 if so, 0 else.
+ */
 int isBoardErroneous()
 {
 	int i=0,j=0;
@@ -61,6 +69,9 @@ int isBoardErroneous()
 	return 0;
 }
 
+/*
+ *  printBoard- "hidden" func that prints board per instructions.
+ */
 void printBoard()
 {
 	int i=0,j=0;
@@ -173,7 +184,10 @@ int validate(int printMessage)
 	}
 }
 
-
+/*
+ * Memory commands- pertaining to main board, fixed board, solved board, and undoRedo List, these 2 funcs
+ * create and free the memory needed. Memory Creator returns 1 if all is good, FATAL_ERROR if calloc failed.
+ */
 void MainMemoryFreer()
 {
 	int i=0;
@@ -219,8 +233,13 @@ int MainMemoryCreator()
 	}
 	return ret;
 }
+/*
+ * END OF MEMORY COMMANDS
+ */
 
-
+/*
+ * OpenFileHelper- "hidden" func that opens file at fileName for edit/solve commands.
+ */
 int OpenFileHelper(char* fileName)
 {
 	LoadFileList *li;
@@ -263,7 +282,14 @@ int OpenFileHelper(char* fileName)
 	return ret;
 }
 
-
+/*
+ * printsForRedoUndo- "hidden" func. takes care of correct printing for undo redo using these parameters.
+ * 			isUndo- 1 if undo, 0 if redo
+ * 			row- current row
+ * 			col- current col
+ * 			num1- number at cell before change
+ * 			num2- number at cell after change
+ */
 void printsForRedoUndo(int isUndo, int row, int col, int num1, int num2)
 {
 	printf("%s %d,%d: from ",isUndo==1?"Undo":"Redo",col,row);

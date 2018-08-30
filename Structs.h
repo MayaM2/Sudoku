@@ -94,15 +94,14 @@ typedef struct stack{
  */
 RecStack* recStackCreator();
 /*
- * Destructor
+ * Destructors
  */
 void destroyStackNode(RecStackNode* n);
 void recStackDestroyer(RecStack* r);
 /*
- * create and push new node into stack (ie- add to FRONT of list). 1st one gets a node and adds, second
- * creates new node with given info and calls first.
+ * create and push new node into stack (ie- add to FRONT of list). 1st "hidden" one gets a node and adds,
+ * second creates new node with given info and calls first.
  */
-void recStackPush(RecStack* r, RecStackNode* n);
 void recStackPushInfo(RecStack* r, int row, int col, int* bin, int dim);
 /*
  * create stack node;
@@ -112,10 +111,6 @@ RecStackNode* recStackNodeCreator(int row, int col, int* bin, int dim);
  * return and update head of stack
  */
 RecStackNode* recStackPop(RecStack* r);
-
-
-void destroyNode(UndoRedoNode* n, int dim);
-void LFLNodeDelete(LoadFileNode *n);
 
 
 #endif /* STRUCTS_H_ */

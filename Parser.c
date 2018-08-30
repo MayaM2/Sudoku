@@ -31,10 +31,7 @@ int IsInteger(const char* s)
    return 1;
 }
 
-/*
- * Reads game command from user and returns
- * a corresponding command struct.
- */
+
 void ParseCommand(Command *currCommand){
 	char readFromUser[256]={0};
 	char* userInp[4],c='a';
