@@ -3,7 +3,15 @@
 
 
 /*
- * Command
+ * Command struct: int commands - will contain a command Enum value according to the relevant command
+ * validity: indicator to whether all parameters are indeed integers, relevant for commands
+ * that accept integers as arguments. 1 if true, 0 false.
+ * arg1, arg2, arg3: if given, command's integer arguments are being stored here.
+ * char *fileName: if given, command's file name argument is being stored here.
+ * At any given moment, only one such Command struct exist. It is initiated by main,
+ * and being changed by parseCommand whenever a new command is being parsed.
+ * When exiting the game, the command struct components are freed.
+ *
  */
 typedef struct Command{
 	int commands;
@@ -16,11 +24,15 @@ typedef struct Command{
 
 
 /*
- * Constructor
+ * commandCreator is a function which initiates a command struct,
+ * and allocates the needed memory for the command struct arguments.
+ * This function is being called once in main.c.
  */
 Command* commandCreator(int commands, int validity, int arg1, int arg2, int arg3);
 /*
- * Destructor
+ * commandDestructor is a function that destructs a command struct, by freeing
+ * dinamically allocated memory.
+ * This function is being called once in main.c when exiting the game.
  */
 void commandDestructor(Command * c);
 
