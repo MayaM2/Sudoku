@@ -109,8 +109,8 @@ void printBoard()
 }
 
 /*
- * returns 1 if a given num is between lower and upper given numbers inclusively.
- * 0 therwise.
+ * numInRange - "hidden" function that returns 1 if a given num is between
+ * lower and upper given numbers inclusively. 0 therwise.
  */
 int numInRange(int num, int lower, int upper){
 	if (num>=lower && num<=upper){
@@ -120,7 +120,7 @@ int numInRange(int num, int lower, int upper){
 }
 
 /*
- * goes over all cells in board. returns 1 if all cells are filled,
+ * allFilled - "hidden" function that goes over all cells in board. returns 1 if all cells are filled,
  * 0 otherwise.
  */
 int allFilled(){
@@ -136,7 +136,7 @@ int allFilled(){
 }
 
 /*
- * Returns 1 if board is empty, 0 otherwise
+ * isBoardEmpty - "hidden" fucntion that returns 1 if board is empty, 0 otherwise
  */
 int isBoardEmpty(){
 	int i=0,j=0;
@@ -151,8 +151,9 @@ int isBoardEmpty(){
 }
 
 
-/* returns 1 if validation passed, 0 otherwise
- * will print to user only if int printMessages == 1*/
+/* validate - "hidden" function that validates the board by calling ILPSolver.
+ * Returns 1 if board validation passed, 0 otherwise.
+ * Will print message to user only if printMessages argument is 1*/
 int validate(int printMessage)
 {
 	if(gameMode == SOLVE || gameMode==EDIT){
@@ -307,10 +308,11 @@ void printsForRedoUndo(int isUndo, int row, int col, int num1, int num2)
 
 
 /*
- * to be used by randomFill function.
- * Deals with situations were first random assignment of value to board[i][j] was not valid.
- * returns 1 if successful random value assignment was found
- * 0 otherwise.
+ * problemCellAssignment - "hidden" function being used by randomFill function.
+ * Deals with situations were first random assignment of value to board[i][j] was not valid,
+ * which caused a problem with filling the board. Tries to fill cell randomly.
+ * Returns 1 if successful random value assignment was found
+ * 0 otherwise (case all possible values cause an erroneous board).
  */
 int problemCellAssignment(int i, int j){
 	int numOptions = dim;
@@ -349,10 +351,10 @@ int problemCellAssignment(int i, int j){
 
 
 /*
- * to be used by generate function.
- * recieve int X, and two int arrays in length X, that represent row and col coordinates
- * of X different cells in the game board. try to fill these cells with valid values.
- * if reached a cell that has no legal value available, mission failed - return 0.
+ * randomFill- "hidden" function used by generate function.
+ * Recieves int X, and two int arrays in length X, that represent row and col coordinates
+ * of X different cells in the game board. Tries to randomly fill these cells with valid values.
+ * If reached a cell that has no legal value available - mission failed - return 0.
  * otherwise - a valid assignment was found - return 1.
  */
 int randomFill(int X,int *arri,int *arrj){
@@ -374,8 +376,8 @@ int randomFill(int X,int *arri,int *arrj){
 
 
 /*
- * Generates a new puzzle out of an empty board.
- * Randomly choose x cells. Run ILPSolver (uo tp 1000 times if needed)
+ * generate - "hidden" function that generates a new puzzle out of an empty board.
+ * Randomly choose x cells. Run ILPSolver (uo tp 1000 times if needed).
  * randomly choose y cells and delete them.
  * update the game board
  * return 1 if succeeded, 0 otherwise.
@@ -476,7 +478,7 @@ int generate(int X, int Y){
 }
 
 /*
- * all the following are "hidden" funcs, which doCommand (at the bottom) calls to do the actual commands.
+ * All the following are "hidden" functions, which doCommand (at the bottom) calls to do the actual commands.
  */
 
 void resetCommand()
@@ -566,6 +568,7 @@ void setCommand(Command *inpCommand)
 	}
 }
 
+/*Makes validation checks only, the generation itself is executed by generate funciton. */
 void generateCommand(Command* inpCommand)
 {
 	int i=0,j=0;
@@ -694,7 +697,9 @@ void hintCommand(Command* inpCommand)
  */
 
 /*
- *doCommand - checks type of command using switch case. Checks validity and prints error message if needed, else - calls corresponding function.
+ * doCommand - checks type of command using switch case.
+ * Checks validity and prints error message if needed,
+ * else - calls corresponding function to execute the given command.
  */
 int doCommand(Command* inpCommand){
 	int sols=0,res=0,ret=0;
