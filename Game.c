@@ -171,6 +171,11 @@ int validate(int printMessage)
 			}
 			return 1;
 		}
+		/*case there was a runtime-problem - ILPSolver prints error massege and
+		 * we will return from current doCommand call. */
+		else if (passed == 0){
+			return 0;
+		}
 		else{
 			if(printMessage){
 				printf("Validation failed: board is not solvable\n");
@@ -679,8 +684,13 @@ void hintCommand(Command* inpCommand)
 				return;
 			}
 			i=ILPSolver(board,fixed,solvedBoard,blockHeight,blockWidth,dim);
-			if(!i){
+			if(i==-1){ /*case solution is infinite or unbounded*/
 				printf("Error: board is unsolvable\n");
+				return;
+			}
+			/*case there was a runtime-problem - ILPSolver prints error massege and
+			 * we will return from current hintCommand call. */
+			else if (i == 0){
 				return;
 			}
 			else{
