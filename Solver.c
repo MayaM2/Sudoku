@@ -452,6 +452,8 @@ int ILPSolver(int **board,int**fixed,int**solvedBoard,int blockHeight,int blockW
 	}
 
 	QUIT:
+	/*case there was a runtime problem- print error message*/
+	printf("ERROR: %s\n",GRBgeterrormsg(env));
 	/*case there was a runtime problem- Free model*/
 	free(sol);
 	free(intSol);
