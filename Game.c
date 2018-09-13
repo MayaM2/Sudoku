@@ -246,7 +246,7 @@ int MainMemoryCreator()
 /*
  * OpenFileHelper- "hidden" func that opens file at fileName for edit/solve commands.
  */
-int OpenFileHelper(char* fileName)
+int OpenFileHelper(char* fileName, int isSolve)
 {
 	LoadFileList *li;
 	int ret=1, ofres=0;
@@ -256,7 +256,7 @@ int OpenFileHelper(char* fileName)
 		printErrorMessage("calloc");
 		return FATAL_ERROR;
 	}
-	ofres=openFile(li,fileName,gameMode==SOLVE?1:0);
+	ofres=openFile(li,fileName,isSolve);
 	if(ofres==1)
 	{
 		MainMemoryFreer();
@@ -278,7 +278,7 @@ int OpenFileHelper(char* fileName)
 		undoRedoAppend(undoRedo,board);
 	}
 	else{
-			if(gameMode==EDIT)
+			if(!isSolve)
 				printf("Error: File cannot be opened\n");
 			else
 				printf("Error: File doesn't exist or cannot be opened\n");
@@ -719,27 +719,21 @@ int doCommand(Command* inpCommand){
 switch(inpCommand->commands){
 
 	case SOLVE_COMMAND:
-		gameMode=SOLVE;
-		res=OpenFileHelper(inpCommand->fileName);
-		if(res!=1)
-		{
-			if(res==0)
-				gameMode=INIT;
-			else if(res==FATAL_ERROR)
+		res=OpenFileHelper(inpCommand->fileName,1);
+		if(res==1)
+			gameMode=SOLVE;
+		else
+			if(res==FATAL_ERROR)
 				ret=FATAL_ERROR;
-		}
 		break;
 
 	case EDIT_COMMAND:
-		gameMode=EDIT;
-		res=OpenFileHelper(inpCommand->fileName);
-		if(res!=1)
-		{
-			if(res==0)
-				gameMode=INIT;
-			else if(res==FATAL_ERROR)
+		res=OpenFileHelper(inpCommand->fileName,0);
+		if(res==1)
+			gameMode=EDIT;
+		else
+			if(res==FATAL_ERROR)
 				ret=FATAL_ERROR;
-		}
 		break;
 
 	case RESET_COMMAND: /*ALMOST DONE*/
@@ -747,7 +741,7 @@ switch(inpCommand->commands){
 		break;
 
 
-	case EXIT_COMMAND: /*Available at ant time and mode*/
+	case EXIT_COMMAND: /*Available at any time and mode*/
 		/*FREE MEMORY*/
 		printf("Exiting...\n");
 		MainMemoryFreer();
