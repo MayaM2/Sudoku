@@ -624,12 +624,14 @@ void undoCommand()
 			for(i=0;i<dim;i++)
 				for(j=0;j<dim;j++)
 					if(undoRedo->curr->nodeBoard[i][j]!=undoRedo->curr->next->nodeBoard[i][j])
-					{
 						board[i][j]=undoRedo->curr->nodeBoard[i][j];
+			printBoard();
+			for(i=0;i<dim;i++)
+				for(j=0;j<dim;j++)
+					if(undoRedo->curr->nodeBoard[i][j]!=undoRedo->curr->next->nodeBoard[i][j])
 						printsForRedoUndo(1,i+1,j+1,
 								undoRedo->curr->next->nodeBoard[i][j],
 								undoRedo->curr->nodeBoard[i][j]);
-					}
 		}
 	}
 }
@@ -649,12 +651,14 @@ void redoCommand()
 			for(i=0;i<dim;i++)
 				for(j=0;j<dim;j++)
 					if(undoRedo->curr->nodeBoard[i][j]!=undoRedo->curr->prev->nodeBoard[i][j])
-					{
 						board[i][j]=undoRedo->curr->nodeBoard[i][j];
+			printBoard();
+			for(i=0;i<dim;i++)
+				for(j=0;j<dim;j++)
+					if(undoRedo->curr->nodeBoard[i][j]!=undoRedo->curr->prev->nodeBoard[i][j])
 						printsForRedoUndo(0,i+1,j+1,
 								undoRedo->curr->prev->nodeBoard[i][j],
 								undoRedo->curr->nodeBoard[i][j]);
-					}
 		}
 	}
 }
@@ -796,12 +800,10 @@ switch(inpCommand->commands){
 
 	case UNDO_COMMAND:
 		undoCommand();
-		printBoard();
 		break;
 
 	case REDO_COMMAND:
 		redoCommand();
-		printBoard();
 		break;
 
 	case HINT_COMMAND:
