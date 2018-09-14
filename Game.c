@@ -720,8 +720,12 @@ switch(inpCommand->commands){
 
 	case SOLVE_COMMAND:
 		res=OpenFileHelper(inpCommand->fileName,1);
-		if(res==1)
+		if(res==1){
 			gameMode=SOLVE;
+			printBoard();
+		}
+
+
 		else
 			if(res==FATAL_ERROR)
 				ret=FATAL_ERROR;
@@ -729,8 +733,11 @@ switch(inpCommand->commands){
 
 	case EDIT_COMMAND:
 		res=OpenFileHelper(inpCommand->fileName,0);
-		if(res==1)
+		if(res==1){
 			gameMode=EDIT;
+			printBoard();
+		}
+
 		else
 			if(res==FATAL_ERROR)
 				ret=FATAL_ERROR;
@@ -789,10 +796,12 @@ switch(inpCommand->commands){
 
 	case UNDO_COMMAND:
 		undoCommand();
+		printBoard();
 		break;
 
 	case REDO_COMMAND:
 		redoCommand();
+		printBoard();
 		break;
 
 	case HINT_COMMAND:
