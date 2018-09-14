@@ -21,3 +21,4 @@ Structs.o: Structs.c Structs.h
 	$(CC) $(COMP_FLAG) -c $*.c
 clean:
 	rm -f $(OBJS) $(EXEC)
+all: $(EXEC)
