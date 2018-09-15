@@ -26,7 +26,7 @@ int IsInteger(const char* s)
 	{
 		/*ASCII value of 0 = 48, 9 = 57*/
 		if ((unsigned)s[i] < 48 || (unsigned)s[i] > 57)
-         return 0;
+			return 0;
    }
    return 1;
 }
@@ -57,13 +57,13 @@ void ParseCommand(Command *currCommand){
 		return;
 	}
 
-	for(i=0;i<256 && c!='\n' && c!=EOF;i++)
+	for(i=0;i<256 && c!='\n' && c!='\0' && c!=EOF;i++)
 		c=readFromUser[i];
 	/*clear stdin. this also means that command is invalid!*/
 	if(i==256)
 	{
 		currCommand->commands=INVALID_COMMAND;
-		while((c=getchar())!='\n' && c!=EOF);
+		while((c=getchar())!='\n' && c!=EOF && c!='\0');
 		return;
 	}
 
