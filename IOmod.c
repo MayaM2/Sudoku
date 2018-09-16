@@ -93,21 +93,37 @@ int openFile(LoadFileList* li, char* fileName, int isSolve)
 
 int saveFile(int** board, int** fixed, char* fileName, int gameMode, int blockHeight, int blockWidth)
 {
-	int i=0,j=0, dim=blockHeight*blockWidth;
+	int i=0,j=0, k=0, dim=blockHeight*blockWidth;
 	FILE *fp;
 	fp=fopen(fileName,"w");
 	if(fp==NULL)
 		return 0;
-	fprintf(fp,"%d %d\n",blockHeight,blockWidth);
+	k= fprintf(fp,"%d %d\n",blockHeight,blockWidth);
+	if(k<0){
+		return 0;
+	}
 	for(i=0;i<dim;i++)
 	{
 		for(j=0;j<dim;j++)
 		{
-			fprintf(fp,"%d",board[i][j]);
-			if((gameMode==EDIT && board[i][j]!=0) || fixed[i][j]==1)
-				fprintf(fp,".");
-			if(j<dim-1)
-				fprintf(fp," ");
+			k= fprintf(fp,"%d",board[i][j]);
+			if(k<0){
+				return 0;
+			}
+			if((gameMode==EDIT && board[i][j]!=0) || fixed[i][j]==1){
+				k= fprintf(fp,".");
+				if(k<0){
+					return 0;
+				}
+			}
+
+			if(j<dim-1){
+				k= fprintf(fp," ");
+				if(k<0){
+					return 0;
+				}
+			}
+
 
 		}
 		fprintf(fp,"\n");
